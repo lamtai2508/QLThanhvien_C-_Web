@@ -14,6 +14,8 @@
     <Folder Include="Models\Booking_divice\" />
     <Folder Include="Models\Booking_history\" />
     <Folder Include="Models\Violation_history\" />
+    <Folder Include="Views\Signup\" />
+    <Folder Include="Views\Login\" />
   </ItemGroup>
 
 </Project>
