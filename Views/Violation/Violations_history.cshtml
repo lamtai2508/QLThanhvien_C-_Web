@@ -1,0 +1,92 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+
+    <div class="container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <h2>Quản Lý</h2>
+                <div class="user-info">
+                    <div class="user-avatar">N</div>
+                    <div class="user-name">Nguyễn Văn A</div>
+                </div>
+            </div>
+            <div class="sidebar-menu">
+            <div class="menu-item" onclick="window.location.href='/Member/Profile'">
+                <i>👤</i> Thông tin cá nhân
+            </div>
+            <div class="menu-item" onclick="window.location.href='/Booking/Booking_device'">
+                <i>📅</i> Đặt chỗ thiết bị
+            </div>
+            <div class="menu-item" onclick="window.location.href='/Booking/Booking_history'">
+                <i>📚</i> Lịch sử đặt chỗ
+            </div>
+            <div class="menu-item active">
+                <i>⚠️</i> Lịch sử vi phạm
+            </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="header">
+                <h1>Lịch Sử Vi Phạm</h1>
+                <div class="search-bar">
+                    <input type="text" placeholder="Tìm kiếm...">
+                    <button>🔍</button>
+                </div>
+            </div>
+
+            <!-- Violations History -->
+            <div class="content-section">
+                <div class="section-header">
+                    <h2>Lịch sử vi phạm</h2>
+                </div>
+                <div class="violation-list">
+                    <div class="violation-item">
+                        <div class="violation-date">10/03/2023</div>
+                        <div class="violation-description">Trả thiết bị trễ hạn (Máy chiếu - B001)</div>
+                        <div class="violation-penalty">Phạt: Cảnh cáo</div>
+                    </div>
+                    <div class="violation-item">
+                        <div class="violation-date">25/03/2023</div>
+                        <div class="violation-description">Làm hỏng thiết bị (Máy tính xách tay - B003)</div>
+                        <div class="violation-penalty">Phạt: Bồi thường 500.000đ</div>
+                    </div>
+                    <div class="violation-item">
+                        <div class="violation-date">15/04/2023</div>
+                        <div class="violation-description">Không sử dụng thiết bị đã đặt (Phòng họp A - B002)</div>
+                        <div class="violation-penalty">Phạt: Hạn chế đặt chỗ 1 tuần</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Regulations -->
+            <div class="content-section">
+                <div class="section-header">
+                    <h2>Quy định sử dụng thiết bị</h2>
+                </div>
+                <div class="regulations">
+                    <div class="info-group">
+                        <label>1. Thời gian sử dụng</label>
+                        <p>Người dùng phải trả thiết bị đúng thời hạn đã đăng ký. Nếu cần gia hạn, phải thông báo trước ít nhất 24 giờ.</p>
+                    </div>
+                    <div class="info-group">
+                        <label>2. Bảo quản thiết bị</label>
+                        <p>Người dùng có trách nhiệm bảo quản thiết bị trong tình trạng tốt. Mọi hư hỏng do sử dụng không đúng cách sẽ phải chịu trách nhiệm bồi thường.</p>
+                    </div>
+                    <div class="info-group">
+                        <label>3. Sử dụng đúng mục đích</label>
+                        <p>Thiết bị chỉ được sử dụng cho mục đích đã đăng ký. Nghiêm cấm sử dụng vào mục đích cá nhân hoặc không liên quan đến công việc.</p>
+                    </div>
+                    <div class="info-group">
+                        <label>4. Hình thức xử lý vi phạm</label>
+                        <p>Tùy theo mức độ vi phạm, hình thức xử lý có thể là: cảnh cáo, hạn chế quyền đặt thiết bị, bồi thường thiệt hại, hoặc báo cáo lên cấp quản lý.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
