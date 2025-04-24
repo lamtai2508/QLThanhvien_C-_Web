@@ -374,3 +374,187 @@ body {
         width: 150px;
     }
 }
+/*Login, singup*/
+.body {
+    background-color: #FBF8EF;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    width:100vw;
+}
+.login-container {
+    background-color: white;
+    border-radius: 10px;
+    width: 100vw;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 400px;
+    overflow: hidden;
+}
+.tabs {
+    display: flex;
+    background-color: #80CBC4;
+}
+
+.tab {
+    flex: 1;
+    text-align: center;
+    padding: 15px;
+    cursor: pointer;
+    font-weight: bold;
+    color: white;
+    transition: background-color 0.3s;
+}
+
+    .tab.active {
+        background-color: #5f9e98;
+    }
+
+.form-container {
+    padding: 30px;
+}
+
+.form {
+    display: none;
+}
+
+    .form.active {
+        display: block;
+    }
+
+h2 {
+    color: #80CBC4;
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+.input-group {
+    margin-bottom: 10px;
+}
+
+    .input-group label {
+        display: block;
+        margin-bottom: 5px;
+        color: #555;
+    }
+
+    .input-group input {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        font-size: 16px;
+        transition: border-color 0.3s;
+    }
+
+        .input-group input:focus {
+            border-color: #80CBC4;
+            outline: none;
+        }
+
+.radio-group {
+    display: flex;
+    gap: 15px;
+    margin-left: 20px;
+}
+
+.radio-option {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.radio-option input[type="radio"] {
+    width: auto;
+    margin-right: 5px;
+    accent-color: #80CBC4;
+}
+button {
+    width: 100%;
+    padding: 12px;
+    background-color: #80CBC4;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+    button:hover {
+        background-color: #5f9e98;
+    }
+
+.forgot-password {
+    text-align: right;
+    margin-bottom: 20px;
+}
+
+    .forgot-password a {
+        color: #80CBC4;
+        text-decoration: none;
+        font-size: 14px;
+    }
+
+        .forgot-password a:hover {
+            text-decoration: underline;
+        }
+
+.social-login {
+    margin-top: 20px;
+    text-align: center;
+}
+
+    .social-login p {
+        color: #777;
+        margin-bottom: 15px;
+        position: relative;
+    }
+
+        .social-login p::before,
+        .social-login p::after {
+            content: "";
+            display: inline-block;
+            width: 30%;
+            height: 1px;
+            background-color: #ddd;
+            position: absolute;
+            top: 50%;
+        }
+
+        .social-login p::before {
+            left: 0;
+        }
+
+        .social-login p::after {
+            right: 0;
+        }
+
+.social-icons {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+}
+
+.social-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: #f5f5f5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+    .social-icon:hover {
+        background-color: #e0e0e0;
+    }
+
+@media (max-width: 480px) {
+    .container {
+        width: 90%;
+    }
+}

@@ -1,0 +1,58 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+
+<div class="body">
+    <div class="login-container">
+        <div class="tabs">
+            <div class="tab active" onclick="window.location.href='/Login/Login'">Đăng nhập</div>
+            <div class="tab" onclick="window.location.href='/Register/Register'">Đăng ký</div>
+        </div>
+        <div class="form-container">
+            <div class="form active" id="register">
+                <h2>Đăng ký</h2>
+                <div class="input-group">
+                    <label for="register-MaTV">Mã thành viên</label>
+                    <input type="text" id="register-MaTV" placeholder="Nhập mã thành viên của bạn">
+                </div>
+                <div class="input-group">
+                    <label for="register-name">Họ và tên</label>
+                    <input type="text" id="register-name" placeholder="Nhập họ và tên của bạn">
+                </div>
+                <div class="input-group">
+                    <label>Giới tính:   </label>
+                    <div class="radio-group">
+                        <div class="radio-option">
+                            <input type="radio" id="gender-male" name="gender" value="male">
+                            <label for="gender-male">Nam</label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" id="gender-female" name="gender" value="female">
+                            <label for="gender-female">Nữ</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label for="register-numberphone">Số điện thoại</label>
+                    <input type="text" id="register-numberphone" placeholder="Nhập số điện thoại của bạn">
+                </div>
+                <div class="input-group">
+                    <label for="register-dob">Ngày sinh</label>
+                    <input type="date" id="register-dob">
+                </div>
+                <div class="input-group">
+                    <label for="register-email">Email</label>
+                    <input type="email" id="register-email" placeholder="Nhập email của bạn">
+                </div>
+
+                <div class="input-group">
+                    <label for="login-password">Mật khẩu</label>
+                    <input type="password" id="login-password" placeholder="Nhập mật khẩu của bạn">
+                </div>
+                <button>Đăng ký</button>
+            </div>
+        </div>  
+    </div>
+</div>
