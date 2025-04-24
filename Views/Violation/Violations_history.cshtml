@@ -3,18 +3,19 @@
 *@
 @{
 }
+@model List<QLThanhvien_Web.Models.Violation>
 
-    <div class="container">
-        <!-- Sidebar -->
-        <div class="sidebar">
-            <div class="sidebar-header">
-                <h2>Quản Lý</h2>
-                <div class="user-info">
-                    <div class="user-avatar">N</div>
-                    <div class="user-name">Nguyễn Văn A</div>
-                </div>
+<div class="container">
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h2>Quản Lý</h2>
+            <div class="user-info">
+                <div class="user-avatar">N</div>
+                <div class="user-name">Nguyễn Văn A</div>
             </div>
-            <div class="sidebar-menu">
+        </div>
+        <div class="sidebar-menu">
             <div class="menu-item" onclick="window.location.href='/Member/Profile'">
                 <i>👤</i> Thông tin cá nhân
             </div>
@@ -27,42 +28,35 @@
             <div class="menu-item active">
                 <i>⚠️</i> Lịch sử vi phạm
             </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="header">
+            <h1>Lịch Sử Vi Phạm</h1>
+            <div class="search-bar">
+                <input type="text" placeholder="Tìm kiếm...">
+                <button>🔍</button>
             </div>
         </div>
 
-        <!-- Main Content -->
-        <div class="main-content">
-            <div class="header">
-                <h1>Lịch Sử Vi Phạm</h1>
-                <div class="search-bar">
-                    <input type="text" placeholder="Tìm kiếm...">
-                    <button>🔍</button>
-                </div>
+        <!-- Violations History -->
+        <div class="content-section">
+            <div class="section-header">
+                <h2>Lịch sử vi phạm</h2>
             </div>
-
-            <!-- Violations History -->
-            <div class="content-section">
-                <div class="section-header">
-                    <h2>Lịch sử vi phạm</h2>
-                </div>
+            @foreach (var vl in Model)
+            {
                 <div class="violation-list">
                     <div class="violation-item">
-                        <div class="violation-date">10/03/2023</div>
-                        <div class="violation-description">Trả thiết bị trễ hạn (Máy chiếu - B001)</div>
-                        <div class="violation-penalty">Phạt: Cảnh cáo</div>
-                    </div>
-                    <div class="violation-item">
-                        <div class="violation-date">25/03/2023</div>
-                        <div class="violation-description">Làm hỏng thiết bị (Máy tính xách tay - B003)</div>
-                        <div class="violation-penalty">Phạt: Bồi thường 500.000đ</div>
-                    </div>
-                    <div class="violation-item">
-                        <div class="violation-date">15/04/2023</div>
-                        <div class="violation-description">Không sử dụng thiết bị đã đặt (Phòng họp A - B002)</div>
-                        <div class="violation-penalty">Phạt: Hạn chế đặt chỗ 1 tuần</div>
+                        <div class="violation-date">@vl.violation_date</div>
+                        <div class="violation-description">@vl.violation_type</div>
+                        <div class="violation-penalty">@vl.penalty</div>
                     </div>
                 </div>
-            </div>
+            }
+        </div>
 
             <!-- Regulations -->
             <div class="content-section">
