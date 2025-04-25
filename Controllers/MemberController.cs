@@ -1,4 +1,4 @@
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using MySql.Data.MySqlClient;
 using QLThanhvien_Web.Models;
@@ -15,6 +15,7 @@ namespace QLThanhvien_Web.Controllers
         {
             _db = db;
         }
+        //Lấy thông tin của member theo Id
         public List<Member> GetMemberById(string memberId)
         {
             var members = new List<Member>();
@@ -44,12 +45,12 @@ namespace QLThanhvien_Web.Controllers
         }
         public IActionResult Profile()
         {
-            var accountId = Request.Cookies["account_id"];
+            var accountId = Request.Cookies["account_id"]; //Lấy account_id từ cookie
             if (string.IsNullOrEmpty(accountId))
             {
-                return RedirectToAction("Login", "Login");
+                return RedirectToAction("Login", "Login"); // nếu cookie null, trả về trang đăng nhập
             }
-            var info = GetMemberById(accountId);
+            var info = GetMemberById(accountId); 
             return View(info);
         }
 

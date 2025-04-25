@@ -45,24 +45,28 @@ namespace QLThanhvien_Web.Controllers
         public IActionResult Login(string account_id, string password)
         {
             var account = GetAccountId(account_id);
+            // Báo lỗi khi để trống
             if (account_id == null || password == null)
             {
                 ViewBag.ErrorMessage = "Không được để trống";
                 return View();
             }
+            // báo lỗi khi mã thành viên không tồn tại
             if (account == null)
             {
                 ViewBag.ErrorMessage = "Mã thành viên không tồn tại!!";
                 return View();
             }
+            //đăng nhập thành công và lưu thông tin vào cookie
             if (CheckPassword(account_id, password))
             {
                 Response.Cookies.Append("account_id", account_id, new CookieOptions
                 {
                     Expires = DateTimeOffset.Now.AddHours(1)
                 });
-                return RedirectToAction("Profile", "Member");
+                return RedirectToAction("Profile", "Member"); // chuyển hướng tới Profile
             }
+            //báo lỗi sai mật khẩu
             else
             {
                 ViewBag.ErrorMessage = "Mật khẩu không chính xác!!";
