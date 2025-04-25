@@ -44,7 +44,12 @@ namespace QLThanhvien_Web.Controllers
         }
         public IActionResult Profile()
         {
-            var info = GetMemberById("TV112");
+            var accountId = Request.Cookies["account_id"];
+            if (string.IsNullOrEmpty(accountId))
+            {
+                return RedirectToAction("Login", "Login");
+            }
+            var info = GetMemberById(accountId);
             return View(info);
         }
 
