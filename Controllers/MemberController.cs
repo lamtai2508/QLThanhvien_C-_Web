@@ -43,6 +43,31 @@ namespace QLThanhvien_Web.Controllers
             }
             return members;
         }
+        // Chính sửa thông tin
+        public bool UpdateMember(Member mb)
+        {
+            var members = new List<Member>();
+            using var conn = _db.GetConnection();
+            conn.Open();
+            string query = "UPDATE Members " +
+                    "SET full_name = @full_name," +
+                    "gender = @gender," +
+                    "number_phone = @number_phone," +
+                    "dob = @dob," +
+                    "email = @email," +
+                "WHERE member_id = @member_id;";
+
+            using var cmd = new MySqlCommand(query, conn);
+            cmd.Parameters.AddWithValue("@full_name", mb.full_name);
+            cmd.Parameters.AddWithValue("@gender", mb.gender);
+            cmd.Parameters.AddWithValue("@number_phone", mb.number_phone);
+            cmd.Parameters.AddWithValue("@dob", mb.dob);
+            cmd.Parameters.AddWithValue("@email", mb.email);
+            cmd.Parameters.AddWithValue("@member_id", mb.member_id);
+
+            int rowsAffected = cmd.ExecuteNonQuery();
+            return rowsAffected > 0;
+        }
         public IActionResult Profile()
         {
             var accountId = Request.Cookies["account_id"]; //Lấy account_id từ cookie
