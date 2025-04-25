@@ -2,19 +2,21 @@
     For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 *@
 @{
+    ViewBag.Title = "BookingHistory";
 }
+@model List<QLThanhvien_Web.Models.Reservation>
 
-    <div class="container">
-        <!-- Sidebar -->
-        <div class="sidebar">
-            <div class="sidebar-header">
-                <h2>Quản Lý</h2>
-                <div class="user-info">
-                    <div class="user-avatar">N</div>
-                    <div class="user-name">Nguyễn Văn A</div>
-                </div>
+<div class="container">
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h2>Quản Lý</h2>
+            <div class="user-info">
+                <div class="user-avatar">N</div>
+                <div class="user-name">Nguyễn Văn A</div>
             </div>
-            <div class="sidebar-menu">
+        </div>
+        <div class="sidebar-menu">
             <div class="menu-item" onclick="window.location.href='/Member/Profile'">
                 <i>👤</i> Thông tin cá nhân
             </div>
@@ -27,87 +29,61 @@
             <div class="menu-item" onclick="window.location.href='/Violation/Violations_history'">
                 <i>⚠️</i> Lịch sử vi phạm
             </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="header">
+            <h1>Lịch Sử Đặt Chỗ</h1>
+            <div class="search-bar">
+                <input type="text" placeholder="Tìm kiếm...">
+                <button>🔍</button>
             </div>
         </div>
 
-        <!-- Main Content -->
-        <div class="main-content">
-            <div class="header">
-                <h1>Lịch Sử Đặt Chỗ</h1>
-                <div class="search-bar">
-                    <input type="text" placeholder="Tìm kiếm...">
-                    <button>🔍</button>
+        <!-- Booking History -->
+        <div class="content-section">
+            <div class="section-header">
+                <h2>Lịch sử đặt chỗ</h2>
+                <div>
+                    <select id="status-filter">
+                        <option value="all">Tất cả trạng thái</option>
+                        <option value="approved">Đã duyệt</option>
+                        <option value="pending">Đang chờ</option>
+                        <option value="rejected">Từ chối</option>
+                    </select>
                 </div>
             </div>
 
-            <!-- Booking History -->
-            <div class="content-section">
-                <div class="section-header">
-                    <h2>Lịch sử đặt chỗ</h2>
-                    <div>
-                        <select id="status-filter">
-                            <option value="all">Tất cả trạng thái</option>
-                            <option value="approved">Đã duyệt</option>
-                            <option value="pending">Đang chờ</option>
-                            <option value="rejected">Từ chối</option>
-                        </select>
-                    </div>
-                </div>
-                <table class="data-table">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Thiết bị</th>
-                            <th>Ngày đặt</th>
-                            <th>Thời gian</th>
-                            <th>Trạng thái</th>
-                            <th>Hành động</th>
-                        </tr>
-                    </thead>
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Thiết bị</th>
+                        <th>Ngày đặt</th>
+                        <th>Thời gian đặt</th>
+                        <th>Thời gian trả</th>
+                        <th>Trạng thái</th>
+                        <th>Hành động</th>
+                    </tr>
+                </thead>
+                @foreach (var res in Model)
+                {
                     <tbody>
                         <tr>
-                            <td>B001</td>
-                            <td>Máy chiếu</td>
-                            <td>15/04/2023</td>
-                            <td>09:00 - 11:00</td>
-                            <td><span class="status approved">Đã duyệt</span></td>
-                            <td><button class="btn btn-secondary">Chi tiết</button></td>
-                        </tr>
-                        <tr>
-                            <td>B002</td>
-                            <td>Phòng họp A</td>
-                            <td>20/04/2023</td>
-                            <td>13:00 - 15:00</td>
-                            <td><span class="status pending">Đang chờ</span></td>
-                            <td><button class="btn btn-secondary">Chi tiết</button></td>
-                        </tr>
-                        <tr>
-                            <td>B003</td>
-                            <td>Máy tính xách tay</td>
-                            <td>25/04/2023</td>
-                            <td>10:00 - 12:00</td>
-                            <td><span class="status rejected">Từ chối</span></td>
-                            <td><button class="btn btn-secondary">Chi tiết</button></td>
-                        </tr>
-                        <tr>
-                            <td>B004</td>
-                            <td>Camera</td>
-                            <td>01/05/2023</td>
-                            <td>14:00 - 16:00</td>
-                            <td><span class="status approved">Đã duyệt</span></td>
-                            <td><button class="btn btn-secondary">Chi tiết</button></td>
-                        </tr>
-                        <tr>
-                            <td>B005</td>
-                            <td>Phòng họp B</td>
-                            <td>05/05/2023</td>
-                            <td>09:00 - 12:00</td>
-                            <td><span class="status pending">Đang chờ</span></td>
+                            <td>@res.reservation_id</td>
+                            <td>@res.Device.device_name</td>
+                            <td>@res.reservation_date</td>
+                            <td>@res.borrowed_date</td>
+                            <td>@res.returned_date</td>
+                            <td><span class="status approved">@res.status</span></td>
                             <td><button class="btn btn-secondary">Chi tiết</button></td>
                         </tr>
                     </tbody>
-                </table>
-            </div>
+                }
+            </table>
+        </div>
 
             <!-- Booking Details (Hidden by default, would be shown when clicking "Chi tiết") -->
             <div class="content-section" id="booking-details" style="display: none;">
