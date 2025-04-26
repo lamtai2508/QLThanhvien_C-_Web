@@ -5,6 +5,6 @@
         public string? device_id { get; set; }
         public string? device_name { get; set; }
         public string? device_type { get; set; }
-        public string? status { get; set; } = "hoạt động";
+        public string status { get; set; } = "Bình thường";
     }
 }

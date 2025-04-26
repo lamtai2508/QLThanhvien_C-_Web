@@ -39,6 +39,28 @@ namespace QLThanhvien_Web.Controllers
             return devices;
         }
 
+        public List<Device> GetAllDevice()
+        {
+            var devices = new List<Device>();
+            using var conn = _db.GetConnection();
+            conn.Open();
+            string query = "Select * from devices";
+            using var cmd = new MySqlCommand(query, conn);
+            using var reader = cmd.ExecuteReader();
+            while (reader.Read())
+            {
+                var device = new Device
+                {
+                    device_id = reader["device_id"].ToString(),
+                    device_name = reader["device_name"].ToString(),
+                    device_type = reader["device_type"].ToString(),
+                    status = reader["status"].ToString()
+                };
+                devices.Add(device);
+            }
+            return devices;
+        }
+
         public List<Reservation> GetReservationByMemberId(string memberId)
         {
             var reservations = new List<Reservation>();
@@ -70,7 +92,12 @@ namespace QLThanhvien_Web.Controllers
 
         public IActionResult Booking_device()
         {
-            return View();
+            var ListAllDevice = GetAllDevice();
+            if (ListAllDevice == null)
+            {
+                ListAllDevice = new List<Device>(); // tránh null
+            }
+            return View(ListAllDevice);
         }
 
         public IActionResult Booking_history()
