@@ -1,4 +1,4 @@
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using MySql.Data.MySqlClient;
 using QLThanhvien_Web.Models;
@@ -15,6 +15,7 @@ namespace QLThanhvien_Web.Controllers
         {
             _db = db;
         }
+        //Lấy thông tin của member theo Id
         public List<Member> GetMemberById(string memberId)
         {
             var members = new List<Member>();
@@ -42,9 +43,63 @@ namespace QLThanhvien_Web.Controllers
             }
             return members;
         }
+        // Chính sửa thông tin
+        public bool UpdateMember(Member mb)
+        {
+            var members = new List<Member>();
+            using var conn = _db.GetConnection();
+            conn.Open();
+            string query = "UPDATE members " +
+                    "SET full_name = @full_name," +
+                    "gender = @gender," +
+                    "number_phone = @number_phone," +
+                    "dob = @dob," +
+                    "email = @email," +
+                    "status = @status " +
+                "WHERE member_id = @member_id ;";
+
+            using var cmd = new MySqlCommand(query, conn);
+            cmd.Parameters.AddWithValue("@full_name", mb.full_name);
+            cmd.Parameters.AddWithValue("@gender", mb.gender);
+            cmd.Parameters.AddWithValue("@number_phone", mb.number_phone);
+            cmd.Parameters.AddWithValue("@dob", mb.dob);
+            cmd.Parameters.AddWithValue("@email", mb.email);
+            cmd.Parameters.AddWithValue("@status", mb.status);
+            cmd.Parameters.AddWithValue("@member_id", mb.member_id);
+
+            int rowsAffected = cmd.ExecuteNonQuery();
+            return rowsAffected > 0;
+        }
+        [HttpPost]
+        public IActionResult Profile(Member mb)
+        {
+            var accountId = Request.Cookies["account_id"]; //Lấy account_id từ cookie
+            if (string.IsNullOrEmpty(mb.full_name) ||
+                string.IsNullOrEmpty(mb.email) ||
+                string.IsNullOrEmpty(mb.number_phone) ||
+                string.IsNullOrEmpty(mb.gender) ||
+                mb.dob == null ) 
+            {
+                ViewBag.ErrorMessage = "Đổi thông tin thất bại";
+                var info = GetMemberById(accountId);
+                return View(info);
+            }
+            if (UpdateMember(mb))
+            {
+                var info = GetMemberById(accountId);
+                return View(info);
+            }
+            return View(GetMemberById(accountId));
+        }
+        [HttpGet]
         public IActionResult Profile()
         {
-            var info = GetMemberById("TV112");
+            var accountId = Request.Cookies["account_id"]; //Lấy account_id từ cookie
+            if (string.IsNullOrEmpty(accountId))
+            {
+                return RedirectToAction("Login", "Login"); // nếu cookie null, trả về trang đăng nhập
+            }
+            var info = GetMemberById(accountId); 
             return View(info);
         }
 

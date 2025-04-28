@@ -12,18 +12,21 @@
         <div class="form-container">
             <div class="form active" id="login">
                 <h2>Đăng nhập</h2>
-                <div class="input-group">
-                    <label for="login-email">Mã thành viên</label>
-                    <input type="email" id="login-email" placeholder="Nhập mã thành viên của bạn">
-                </div>
-                <div class="input-group">
-                    <label for="login-password">Mật khẩu</label>
-                    <input type="password" id="login-password" placeholder="Nhập mật khẩu của bạn">
-                </div>
-                <div class="forgot-password">
-                    <a href="#">Quên mật khẩu?</a>
-                </div>
-                <button onclick="window.location.href='/Member/Profile'">Đăng nhập</button>
+                <form action="/Login/Login" method="post">
+                    <div class="input-group">
+                        <label for="login-email">Mã thành viên</label>
+                        <input type="text" name="account_id" id="account_id" placeholder="Nhập mã thành viên của bạn">
+                    </div>
+                    <div class="input-group">
+                        <label for="login-password">Mật khẩu</label>
+                        <input type="password" name="password" id="password" placeholder="Nhập mật khẩu của bạn">
+                    </div>
+                    @if (ViewBag.ErrorMessage != null)
+                    {
+                        <div style="color: red; margin-top: 10px;">@ViewBag.ErrorMessage</div>
+                    }
+                    <button type="submit">Đăng nhập</button>
+                </form>
             </div>
         </div>
     </div>
