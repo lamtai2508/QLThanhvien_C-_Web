@@ -16,6 +16,29 @@ namespace QLThanhvien_Web.Controllers
             _db = db;
         }
 
+        public List<MemberHistory> GetMemberHistoryByMemberId(string memberId)
+        {
+            var members = new List<MemberHistory>();
+            using var conn = _db.GetConnection();
+            conn.Open();
+            string query = "select * from members where member_id = @memberId";
+            using var cmd = new MySqlCommand(query, conn);
+            cmd.Parameters.AddWithValue("@memberId", memberId);
+            using var reader = cmd.ExecuteReader();
+            while (reader.Read())
+            {
+                var member = new MemberHistory
+                {
+                    member_id = reader["member_id"].ToString(),
+                    device_id = reader["device_id"].ToString(),
+                    reservation_id = reader["reservation_id"].ToString(),
+                    violation_id = reader["violation_id"].ToString()
+                };
+                members.Add(member);
+            }
+            return members;
+        }
+
         public List<Device> GetDeviceById(string deviceId)
         {
             var devices = new List<Device>();
@@ -76,8 +99,6 @@ namespace QLThanhvien_Web.Controllers
         public IActionResult Booking_history()
         {
             var info = GetReservationByMemberId("TV113");
-            Console.WriteLine(info);
-            Console.WriteLine("fail to fetch data");
             return View(info);
         }
     }
