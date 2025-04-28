@@ -42,15 +42,16 @@ namespace QLThanhvien_Web.Controllers
             return violations;
         }
 
-        //public List<Violation> Violation_Search_Option (string memberId, string opt) 
-        //{
-        //    return 
-        //}
+        public string GetLoggedInUserId()
+        {
+            return Request.Cookies["account_id"];
+        }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Violations_history()
         {
-            var info = GetViolationByMemberId("TV113");
+            var memberId = GetLoggedInUserId();
+            var info = GetViolationByMemberId(memberId);
             return View(info);
         }
         public IActionResult Error()

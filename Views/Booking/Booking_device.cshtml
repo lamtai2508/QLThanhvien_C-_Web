@@ -2,6 +2,7 @@
     For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 *@
 @{
+    int i = 0;
 }
 @model List<QLThanhvien_Web.Models.Device>
 
@@ -68,51 +69,48 @@
                         @foreach (var d in Model)
                         {
                             <tr>
-                                <td name="device_id">@d.device_id</td>
-                                <td name="device_name">@d.device_name</td>
-                                <td name="device_type">@d.device_type</td>
-                                <td name="status"><span class="status approved" @(d.status =="bình thường" ? "approved" : "denied" )>@d.status</span></td>
-                                <td><button class="btn btn-primary">Đặt ngay</button></td>
+                                <td name="device_id" id="device_id">@d.device_id</td>
+                                <td name="device_name" id="device_name">@d.device_name</td>
+                                <td name="device_type" id="device_type">@d.device_type</td>
+                                <td name="status" id="device_status"><span class="status approved" @(d.status =="bình thường" ? "approved" : "denied" )>@d.status</span></td>
+                                <td><button class="btn btn-primary" id="subButton">Đặt ngay</button></td>
                             </tr>
                         }
-                        </tbody>
-                    </div>
-                </table>
-                <div style="margin-top:10px;">
-                    <button onclick="prevPage()" id="prevBtn">Previous</button>
-                    <span id="page-info"></span>
-                    <button onclick="nextPage()" id="nextBtn">Next</button>
-                </div>
+                    </tbody>
             </div>
+            </table>
+            <div style="margin-top:10px;">
+                <button onclick="prevPage()" id="prevBtn">Previous</button>
+                <span id="page-info"></span>
+                <button onclick="nextPage()" id="nextBtn">Next</button>
             </div>
+        </div>
+    </div>
 
-            <!-- Booking Form -->
-            <div class="content-section">
-                <div class="section-header">
-                    <h2>Đặt chỗ thiết bị</h2>
-                </div>
-                <form class="booking-form">
-                    <div class="form-group">
-                        <label for="device">Thiết bị</label>
-                        <select id="device">
-                            <option value="">Chọn thiết bị</option>
-                            <option value="1">Máy tính xách tay Dell XPS</option>
-                            <option value="2">Máy chiếu Sony VPL-EX455</option>
-                            <option value="3">iPad Pro 12.9</option>
-                            <option value="5">Máy in HP LaserJet Pro</option>
+    <!-- Booking Form -->
+    <div class="content-section">
+        <div class="section-header">
+            <h2>Đặt chỗ thiết bị</h2>
+        </div>
+        <form class="booking-form">
+            <div class="form-group">
+                <label for="device">Thiết bị</label>
+                <select id="device">
+                    <option value="">Chọn thiết bị</option>
+                    @foreach (var dv in Model)
+                    {
+                        <option value="@dv.device_id" id="device-name">@dv.device_name</option>
+                    }
+
                         </select>
                     </div>
                     <div class="form-group">
-                        <label for="date">Ngày đặt</label>
-                        <input type="date" id="date">
-                    </div>
-                    <div class="form-group">
                         <label for="start-time">Thời gian bắt đầu</label>
-                        <input type="time" id="start-time">
+                        <input type="datetime-local" id="borrowedDate">
                     </div>
                     <div class="form-group">
                         <label for="end-time">Thời gian kết thúc</label>
-                        <input type="time" id="end-time">
+                        <input type="datetime-local" id="returnedDate">
                     </div>
                     <div class="form-group">
                         <label for="purpose">Mục đích sử dụng</label>
@@ -132,7 +130,7 @@
     </div>
 
     <script>
-       var devices = [
+    var devices = [
     @foreach (var d in Model)
     {
         @: {
@@ -143,6 +141,12 @@
         @: },
     }
     ];
+    
+    // locate device to subcription form: 
+    
+
+
+
 
     var currentPage = 1;
     var pageSize = 5;
@@ -189,4 +193,81 @@
 
     // Render lần đầu
     renderDevices();
+
+
+
+    // addReservation value except resId
+
+    function addReservation(deviceId, resDate, resBD, resRD) {
+        // Create the data object
+        const reservationData = {
+            device_id: deviceId,
+            reservation_date: resDate,
+            borrowed_date: resBD,
+            returned_date: resRD,
+        };
+
+        // Send the data to the server using fetch API
+        fetch('/Booking/RetrieveResData', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(reservationData)
+        })
+        .then(response => {
+            if (response.ok) {
+                return response.json();
+            } else {
+                throw new Error('Failed to add reservation');
+            }
+        })
+        .then(data => {
+            // Handle success (e.g., show a success message or update the UI)
+            alert('Reservation added successfully!');
+            console.log(data);
+        })
+        .catch(error => {
+            // Handle error (e.g., show an error message)
+            alert('Error adding reservation: ' + error.message);
+            console.error(error);
+        });
+    }
+
+    // add event listioner to submit button
+    document.addEventListener("DOMContentLoaded", function () {
+        const submitButton = document.querySelector(".btn.btn-primary[type='submit']");
+
+        submitButton.addEventListener("click", function (event) {
+            // Prevent the default form submission
+            event.preventDefault();
+
+            // Get the selected DeviceId from the dropdown
+            const selectElement = document.getElementById("device");
+            const deviceId = selectElement.value; // Gets the value of the selected option (DeviceId)
+
+            // Get other form values
+            const now = new Date(); // Current date and time
+            const reservationDate = formatDateToDatetimeLocal(now); // Format the current date
+            const borrowedDate = document.getElementById("borrowedDate").value;
+            const returnedDate = document.getElementById("returnedDate").value;
+
+            // Call the addReservation function
+            addReservation(deviceId, reservationDate, borrowedDate, returnedDate);
+            console.log(deviceId, reservationDate, borrowedDate, returnedDate);
+        });
+    });
+
+        function formatDateToDatetimeLocal(date) {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        const hours = String(date.getHours()).padStart(2, '0');
+        const minutes = String(date.getMinutes()).padStart(2, '0');
+
+        return `${year}-${month}-${day}T${hours}:${minutes}`;
+    }
+
+
+
     </script>

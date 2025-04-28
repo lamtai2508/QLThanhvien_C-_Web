@@ -7,11 +7,17 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Models\Booking_divice\**" />
+    <Content Remove="Models\Booking_divice\**" />
+    <EmbeddedResource Remove="Models\Booking_divice\**" />
+    <None Remove="Models\Booking_divice\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="MySql.Data" Version="9.3.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Models\Booking_divice\" />
     <Folder Include="Models\Booking_history\" />
     <Folder Include="Models\Violation_history\" />
   </ItemGroup>
