@@ -47,6 +47,7 @@ body {
 /* Sidebar */
 .sidebar {
     width: 250px;
+    height: 100vh;
     background-color: #80CBC4;
     color: #000;
     padding: 20px 0;

@@ -1,0 +1,37 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+@model List<QLThanhvien_Web.Models.Member>
+
+<div class="sidebar">
+    <div class="sidebar-header">
+        <h2>Quản Lý</h2>
+        @foreach (var mb in Model)
+        {
+            <div class="user-info">
+                @* <div class="user-name" style="text-align: center; font-size: 25px">Chào mừng tới thư quán</div> *@
+                <div class="user-id">Họ tên: @mb.full_name </div>
+                <div class="user-id">Mã Thành viên: @mb.member_id </div>
+            </div>
+        }
+    </div>
+    <div class="sidebar-menu">
+        <div class="menu-item active">
+            <i>👤</i> Thông tin cá nhân
+        </div>
+        <div class="menu-item" onclick="window.location.href='/Booking/Booking_device'">
+            <i>📅</i> Đặt chỗ thiết bị
+        </div>
+        <div class="menu-item" onclick="window.location.href='/Booking/Booking_history'">
+            <i>📚</i> Lịch sử đặt chỗ
+        </div>
+        <div class="menu-item" onclick="window.location.href='/Violation/Violations_history'">
+            <i>⚠️</i> Lịch sử vi phạm
+        </div>
+        <div class="menu-item" onclick="window.location.href='/Login/Login'">
+            <i>🔚</i> Đăng xuất
+        </div>
+    </div>
+</div>

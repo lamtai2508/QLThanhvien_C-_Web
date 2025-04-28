@@ -12,8 +12,10 @@
         <div class="sidebar-header">
             <h2>Quản Lý</h2>
             <div class="user-info">
-                <div class="user-avatar">N</div>
-                <div class="user-name">Nguyễn Văn A</div>
+                <div class="user-name" style="text-align: center; font-size: 25px">Chào mừng tới thư quán</div>
+
+                @* <div class="user-avatar">N</div> *@
+                @* <div class="user-name">Nguyễn Văn A</div> *@
             </div>
         </div>
         <div class="sidebar-menu">
@@ -28,6 +30,9 @@
             </div>
             <div class="menu-item" onclick="window.location.href='/Violation/Violations_history'">
                 <i>⚠️</i> Lịch sử vi phạm
+            </div>
+            <div class="menu-item" onclick="window.location.href='/ChangePassword/ChangePassword'">
+                <i>🔒</i> Đổi mật khẩu
             </div>
             <div class="menu-item" onclick="window.location.href='/Login/Login'">
                 <i>🔚</i> Đăng xuất
@@ -73,7 +78,7 @@
                 </thead>
                 @foreach (var res in Model)
                 {
-                    <tbody>
+                    <tbody id="deviceTableBody">
                         <tr>
                             <td>@res.reservation_id</td>
                             <td>@res.Device.device_name</td>
@@ -86,6 +91,11 @@
                     </tbody>
                 }
             </table>
+            <div style="margin-top:10px;">
+                <button onclick="prevPage()" id="prevBtn">Previous</button>
+                <span id="page-info"></span>
+                <button onclick="nextPage()" id="nextBtn">Next</button>
+            </div>
         </div>
 
             <!-- Booking Details (Hidden by default, would be shown when clicking "Chi tiết") -->
@@ -143,4 +153,66 @@
                 document.getElementById('booking-details').style.display = 'block';
             });
         });
-    </script>
+        <script>
+       var booking_devices = [
+        @foreach (var res in Model)
+        {
+        @: {
+        @: "reservation_id": "@res.reservation_id",
+        @: "Device.device_name": "@res.Device.device_name",
+        @: "reservation_date": "@res.reservation_date",
+        @: "borrowed_date": "@res.borrowed_date",
+        @: "returned_date": "@res.returned_date",
+        @: "status": "@res.status"
+        @: },
+        }
+        ];
+
+        var currentPage = 1;
+        var pageSize = 5;
+
+        function renderDevices() {
+            var start = (currentPage - 1) * pageSize;
+            var end = start + pageSize;
+            var pageDevices = devices.slice(start, end);
+
+            var tableBody = document.getElementById("deviceTableBody");
+            tableBody.innerHTML = "";
+
+         pageDevices.forEach(function(booking_device) {
+                var row = `<tr>
+                              <td>${booking_device.reservation_id}</td>
+                              <td>${booking_device.Device.device_name}</td>
+                              <td>${booking_device.reservation_date}</td>
+                              <td>${booking_device.borrowed_date}</td>
+                              <td>${booking_device.returned_date}</td>
+                              <td><span class="status ${booking_device.status == "bình thường" ? "approved" : "denied"}">${device.status}</span></td>
+                              <td><button class="btn btn-primary">Đặt ngay</button></td>
+                            </tr>`;
+                tableBody.innerHTML += row;
+            });
+
+            document.getElementById("page-info").innerText = `Trang ${currentPage} / ${Math.ceil(devices.length / pageSize)}`;
+
+            // Toggle visibility of buttons
+            document.getElementById("prevBtn").style.display = currentPage > 1 ? 'inline-block' : 'none';
+            document.getElementById("nextBtn").style.display = currentPage * pageSize < devices.length ? 'inline-block' : 'none';
+        }
+
+        function nextPage() {
+            if (currentPage * pageSize < devices.length) {
+                currentPage++;
+                renderDevices();
+            }
+        }
+
+        function prevPage() {
+            if (currentPage > 1) {
+                currentPage--;
+                renderDevices();
+            }
+        }
+        // render lần đầu
+        renderDevices();
+</script>
+
