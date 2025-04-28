@@ -84,6 +84,18 @@ namespace QLThanhvien_Web.Controllers
             return devices;
         }
 
+        public void UpdateDeviceStatus(string deviceId)
+        {
+
+            using var conn = _db.GetConnection();
+            conn.Open();
+            string query = "UPDATE devices SET status = @newStatus WHERE device_id = @deviceId";
+            using var cmd = new MySqlCommand(query, conn);
+            cmd.Parameters.AddWithValue("@newStatus", "Được đặt chỗ");
+            cmd.Parameters.AddWithValue("@deviceId", deviceId);
+            cmd.ExecuteNonQuery();
+        }
+
         public List<Reservation> GetReservationByMemberId(string memberId)
         {
             var reservations = new List<Reservation>();
@@ -110,8 +122,72 @@ namespace QLThanhvien_Web.Controllers
             return reservations;
         }
 
+        private string GenerateReservationId()
+        {
+            try
+            {
+                using var conn = _db.GetConnection();
+                conn.Open();
+
+                // Query to get the latest reservation ID
+                string query = "SELECT reservation_id FROM reservations WHERE reservation_id LIKE 'R%' ORDER BY reservation_id DESC LIMIT 1";
+                using var cmd = new MySqlCommand(query, conn);
+                var latestId = cmd.ExecuteScalar()?.ToString();
+
+                // Generate the next ID
+                if (string.IsNullOrEmpty(latestId))
+                {
+                    return "R001"; // Start with R001 if no reservations exist
+                }
+
+                // Extract the numeric part and increment it
+                if (!int.TryParse(latestId.Substring(1), out int numericPart))
+                {
+                    throw new FormatException($"Invalid reservation_id format: {latestId}");
+                }
+
+                return $"R{(numericPart + 1).ToString("D3")}";
+            }
+            catch (Exception ex)
+            {
+                // Log the error (replace with your logging mechanism)
+                Console.WriteLine($"Error generating reservation ID: {ex.Message}");
+                throw;
+            }
+        }
+
+
+
+
+        public void AddReservation (string deviceId, string reservationDate, string borrowedDate, string returnedDate)
+        {
+            string reservationId = GenerateReservationId(); // Auto-generate the ID
+            string memberId = GetLoggedInUserId(); // Get logged in userId
+            using var conn = _db.GetConnection();
+            conn.Open();
+            string query = @"INSERT INTO reservations 
+                     (reservation_id, member_id, device_id, reservation_date, borrowed_date, returned_date, status) 
+                     VALUES 
+                     (@reservationId, @memberId, @deviceId, @reservationDate, @borrowedDate, @returnedDate, @status)";
+            using var cmd = new MySqlCommand(query, conn);
+            cmd.Parameters.AddWithValue("@reservationId", reservationId);
+            cmd.Parameters.AddWithValue("@memberId", memberId);
+            cmd.Parameters.AddWithValue("@deviceId", deviceId);
+            cmd.Parameters.AddWithValue("@reservationDate", Convert.ToDateTime(reservationDate));
+            cmd.Parameters.AddWithValue("@borrowedDate", string.IsNullOrEmpty(borrowedDate) ? (object)DBNull.Value : Convert.ToDateTime(borrowedDate));
+            cmd.Parameters.AddWithValue("@returnedDate", string.IsNullOrEmpty(returnedDate) ? (object)DBNull.Value : Convert.ToDateTime(returnedDate));
+            cmd.Parameters.AddWithValue("@status", "Chờ duyệt");
+            cmd.ExecuteNonQuery();
+        }
+
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+
+        public string GetLoggedInUserId()
+        {
+            return Request.Cookies["account_id"];
+        }
+
 
         public IActionResult Booking_device()
         {
@@ -123,10 +199,36 @@ namespace QLThanhvien_Web.Controllers
             return View(ListAllDevice);
         }
 
+        [HttpPost]
+        public IActionResult RetrieveResData([FromBody] Reservation reservation)
+        {
+            try
+            {
+                // Add the reservation to the database
+                AddReservation(
+                    reservation.device_id,
+                    reservation.reservation_date?.ToString(),
+                    reservation.borrowed_date?.ToString(),
+                    reservation.returned_date?.ToString()
+                );
+                UpdateDeviceStatus(reservation.device_id);
+                // Return a success response
+                return Json(new { success = true, message = "Reservation added successfully" });
+            }
+            catch (Exception ex)
+            {
+                // Return an error response
+                return Json(new { success = false, message = ex.Message});
+            }
+        }
+
+
+
         public IActionResult Booking_history()
         {
-            var info = GetReservationByMemberId("TV113");
-            return View(info);
+            var info = GetLoggedInUserId();
+            var memberList = GetReservationByMemberId(info);
+            return View(memberList);
         }
     }
 }
