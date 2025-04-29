@@ -190,11 +190,86 @@
     // Render lần đầu
     renderDevices();
     
+
+    // EventListener to search-bar
+
+    document.addEventListener("DOMContentLoaded", function () {
+    const searchInput = document.querySelector(".search-bar input");
+    const searchButton = document.querySelector(".search-bar button");
+
+    // Event listener for the search button
+    searchButton.addEventListener("click", function () {
+        const query = searchInput.value.trim(); // Get the search input value
+        fetchDevices(query); // Call the function to fetch devices
+    });
+
+    // Event listener for the "Enter" key in the search input
+    searchInput.addEventListener("keydown", function (event) {
+        if (event.key === "Enter") {
+            event.preventDefault(); // Prevent the default form submission behavior
+            const query = searchInput.value.trim(); // Get the search input value
+            fetchDevices(query); // Call the function to fetch devices
+        }
+    });
+
+    // Function to fetch devices from the server
+    function fetchDevices(query) {
+        fetch(`/Booking/SearchDevices?input=${encodeURIComponent(query)}`, {
+            method: "GET",
+        })
+            .then((response) => {
+                if (!response.ok) {
+                    throw new Error("Failed to fetch devices");
+                }
+                return response.json();
+            })
+            .then((data) => {
+                // Update the devices list in the UI
+                updateDeviceTable(data);
+            })
+            .catch((error) => {
+                console.error("Error fetching devices:", error);
+                alert("Có lỗi xảy ra khi tìm kiếm thiết bị.");
+            });
+    }
+
+    // Function to update the device table in the UI
+    function updateDeviceTable(devices) {
+        const tableBody = document.getElementById("deviceTableBody");
+        tableBody.innerHTML = ""; // Clear the existing table rows
+
+        devices.forEach((device) => {
+            const row = `<tr>
+                            <td name="device_id">${device.device_id}</td>
+                            <td name="device_name">${device.device_name}</td>
+                            <td name="device_type">${device.device_type}</td>
+                            <td><span class="status ${device.status === "bình thường" ? "approved" : "denied"}">${device.status}</span></td>
+                            <td><button class="btn btn-primary subButton">Đặt ngay</button></td>
+                        </tr>`;
+            tableBody.innerHTML += row;
+        });
+
+        // Reattach event listeners to the "Đặt ngay" buttons
+        attachSubButtonListeners();
+    }
+
+    // Function to reattach event listeners to "Đặt ngay" buttons
+    function attachSubButtonListeners() {
+        const subButtons = document.querySelectorAll(".subButton");
+        subButtons.forEach((button) => {
+            button.addEventListener("click", function () {
+                changeOptions(button);
+            });
+        });
+    }
+});
+
+
     // change selected option to match "Đặt ngay" button
 
-        document.addEventListener("DOMContentLoaded", function () {
-        // Use event delegation on the parent element
-        const tableBody = document.getElementById("deviceTableBody");
+    document.addEventListener("DOMContentLoaded", function () {
+    // Use event delegation on the parent element
+    const tableBody = document.getElementById("deviceTableBody");
 
         tableBody.addEventListener("click", function (event) {
             // Check if the clicked element is a subButton

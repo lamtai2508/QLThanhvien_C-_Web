@@ -75,7 +75,7 @@
                 {
                     <tbody>
                         <tr>
-                            <td>@res.reservation_id</td>
+                            <td name="res_id">@res.reservation_id</td>
                             <td>@res.device_id</td>
                             <td>@res.reservation_date</td>
                             <td>@res.borrowed_date</td>
@@ -88,59 +88,106 @@
             </table>
         </div>
 
-            <!-- Booking Details (Hidden by default, would be shown when clicking "Chi tiết") -->
-            <div class="content-section" id="booking-details" style="display: none;">
-                <div class="section-header">
-                    <h2>Chi tiết đặt chỗ</h2>
-                    <button onclick="document.getElementById('booking-details').style.display = 'none'">Đóng</button>
-                </div>
-                <div class="user-profile">
-                    <div class="profile-info">
+        <!-- Booking Details (Hidden by default, would be shown when clicking "Chi tiết") -->
+        <div class="content-section" id="booking-details" style="display: none;">
+            <div class="section-header">
+                <h2>Chi tiết đặt chỗ</h2>
+                <button onclick="document.getElementById('booking-details').style.display = 'none'">Đóng</button>
+            </div>
+            <div class="user-profile">
+                <div class="profile-info">
+                        
                         <div class="info-group">
-                            <label>ID đặt chỗ</label>
-                            <p>B001</p>
+                            <label for="reservation_id">reservation_id</label>
+                            <p>device_id</p>
                         </div>
                         <div class="info-group">
                             <label>Thiết bị</label>
-                            <p>Máy chiếu</p>
+                            <p>reservation_id</p>
                         </div>
                         <div class="info-group">
                             <label>Ngày đặt</label>
-                            <p>15/04/2023</p>
+                            <p>reservation_date</p>
                         </div>
-                        <div class="info-group">
-                            <label>Thời gian</label>
-                            <p>09:00 - 11:00</p>
+                        <div class="profile-info">
+                            <div class="info-group">
+                                <label>Trạng thái</label>
+                                <p><span class="status approved">status</span></p>
+                            </div>
                         </div>
-                    </div>
-                    <div class="profile-info">
-                        <div class="info-group">
-                            <label>Trạng thái</label>
-                            <p><span class="status approved">Đã duyệt</span></p>
-                        </div>
-                        <div class="info-group">
-                            <label>Mục đích sử dụng</label>
-                            <p>Họp dự án ABC</p>
-                        </div>
-                        <div class="info-group">
-                            <label>Địa điểm</label>
-                            <p>Phòng họp tầng 3</p>
-                        </div>
-                        <div class="info-group">
-                            <label>Ghi chú</label>
-                            <p>Cần chuẩn bị màn hình và loa</p>
-                        </div>
-                    </div>
+                    
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        // Mã JavaScript để hiển thị chi tiết khi nhấn nút "Chi tiết"
+        // Convert Razor model data into a JavaScript object
+        var reservations = [
+        @foreach (var res in Model)
+        {
+            @: {
+            @: "reservation_id": "@res.reservation_id",
+            @: "device_name": "@ViewBag.DeviceNames[res.reservation_id]",
+            @: "reservation_date": "@res.reservation_date?.ToString("yyyy-MM-dd")",
+            @: "borrowed_date": "@res.borrowed_date?.ToString("yyyy-MM-dd")",
+            @: "returned_date": "@res.returned_date?.ToString("yyyy-MM-dd")",
+            @: "status": "@res.status"
+            @: },
+        }
+        ];
+
+        // Add event listeners to all "Chi tiết" buttons
         document.querySelectorAll('.btn-secondary').forEach(button => {
             button.addEventListener('click', function() {
-                document.getElementById('booking-details').style.display = 'block';
+                // Get the reservation_id from the row
+                const row = this.closest('tr');
+                const reservationId = row.querySelector('[name="res_id"]').innerText.trim();
+
+                // Find the matching reservation data
+                const reservation = reservations.find(r => r.reservation_id === reservationId);
+
+                if (reservation) {
+                    // Populate the booking details section
+                    document.getElementById('booking-details').style.display = 'block';
+                    document.getElementById('booking-details').innerHTML = `
+                        <div class="section-header">
+                            <h2>Chi tiết đặt chỗ</h2>
+                            <button onclick="document.getElementById('booking-details').style.display = 'none'">Đóng</button>
+                        </div>
+                        <div class="user-profile">
+                            <div class="profile-info">
+                                <div class="info-group">
+                                    <label>ID Đặt chỗ</label>
+                                    <p>${reservation.reservation_id}</p>
+                                </div>
+                                <div class="info-group">
+                                    <label>Thiết bị</label>
+                                    <p>${reservation.device_name}</p>
+                                </div>
+                                <div class="info-group">
+                                    <label>Ngày đặt</label>
+                                    <p>${reservation.reservation_date || 'N/A'}</p>
+                                </div>
+                                <div class="info-group">
+                                    <label>Thời gian mượn</label>
+                                    <p>${reservation.borrowed_date || 'N/A'}</p>
+                                </div>
+                                <div class="info-group">
+                                    <label>Thời gian trả</label>
+                                    <p>${reservation.returned_date || 'N/A'}</p>
+                                </div>
+                                <div class="info-group">
+                                    <label>Trạng thái</label>
+                                    <p><span class="status approved">${reservation.status}</span></p>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    alert('Không tìm thấy thông tin đặt chỗ!');
+                }
             });
         });
     </script>
+
