@@ -73,7 +73,7 @@
                                 <td name="device_name" id="device_name">@d.device_name</td>
                                 <td name="device_type" id="device_type">@d.device_type</td>
                                 <td name="status" id="device_status"><span class="status approved" @(d.status =="bình thường" ? "approved" : "denied" )>@d.status</span></td>
-                                <td><button class="btn btn-primary" id="subButton">Đặt ngay</button></td>
+                                <td><button class="btn btn-primary subButton" id="subButton" >Đặt ngay</button></td>
                             </tr>
                         }
                     </tbody>
@@ -106,19 +106,19 @@
                     </div>
                     <div class="form-group">
                         <label for="start-time">Thời gian bắt đầu</label>
-                        <input type="datetime-local" id="borrowedDate">
+                        <input type="datetime-local" id="borrowedDate" required>
                     </div>
                     <div class="form-group">
                         <label for="end-time">Thời gian kết thúc</label>
-                        <input type="datetime-local" id="returnedDate">
+                        <input type="datetime-local" id="returnedDate" required>
                     </div>
                     <div class="form-group">
                         <label for="purpose">Mục đích sử dụng</label>
-                        <textarea id="purpose" placeholder="Nhập mục đích sử dụng thiết bị..."></textarea>
+                        <textarea id="purpose" placeholder="Nhập mục đích sử dụng thiết bị..." required></textarea>
                     </div>
                     <div class="form-group">
                         <label for="location">Địa điểm sử dụng</label>
-                        <input type="text" id="location" placeholder="Nhập địa điểm sử dụng">
+                        <input type="text" id="location" placeholder="Nhập địa điểm sử dụng" required>
                     </div>
                     <div class="form-actions">
                         <button type="button" class="btn btn-secondary">Hủy</button>
@@ -161,11 +161,11 @@
 
         pageDevices.forEach(function(device) {
             var row = `<tr>
-                            <td>${device.device_id}</td>
-                            <td>${device.device_name}</td>
-                            <td>${device.device_type}</td>
+                            <td name="device_id">${device.device_id}</td>
+                            <td name="device_name">${device.device_name}</td>
+                            <td name="device_type">${device.device_type}</td>
                             <td><span class="status ${device.status == "bình thường" ? "approved" : "denied"}">${device.status}</span></td>
-                            <td><button class="btn btn-primary">Đặt ngay</button></td>
+                            <td><button class="btn btn-primary subButton">Đặt ngay</button></td>
                         </tr>`;
             tableBody.innerHTML += row;
         });
@@ -193,10 +193,128 @@
 
     // Render lần đầu
     renderDevices();
+    
+
+    // EventListener to search-bar
+
+    document.addEventListener("DOMContentLoaded", function () {
+    const searchInput = document.querySelector(".search-bar input");
+    const searchButton = document.querySelector(".search-bar button");
+
+    // Event listener for the search button
+    searchButton.addEventListener("click", function () {
+        const query = searchInput.value.trim(); // Get the search input value
+        fetchDevices(query); // Call the function to fetch devices
+    });
+
+    // Event listener for the "Enter" key in the search input
+    searchInput.addEventListener("keydown", function (event) {
+        if (event.key === "Enter") {
+            event.preventDefault(); // Prevent the default form submission behavior
+            const query = searchInput.value.trim(); // Get the search input value
+            fetchDevices(query); // Call the function to fetch devices
+        }
+    });
+
+    // Function to fetch devices from the server
+    function fetchDevices(query) {
+        fetch(`/Booking/SearchDevices?input=${encodeURIComponent(query)}`, {
+            method: "GET",
+        })
+            .then((response) => {
+                if (!response.ok) {
+                    throw new Error("Failed to fetch devices");
+                }
+                return response.json();
+            })
+            .then((data) => {
+                // Update the devices list in the UI
+                updateDeviceTable(data);
+            })
+            .catch((error) => {
+                console.error("Error fetching devices:", error);
+                alert("Có lỗi xảy ra khi tìm kiếm thiết bị.");
+            });
+    }
+
+    // Function to update the device table in the UI
+    function updateDeviceTable(devices) {
+        const tableBody = document.getElementById("deviceTableBody");
+        tableBody.innerHTML = ""; // Clear the existing table rows
+
+        devices.forEach((device) => {
+            const row = `<tr>
+                            <td name="device_id">${device.device_id}</td>
+                            <td name="device_name">${device.device_name}</td>
+                            <td name="device_type">${device.device_type}</td>
+                            <td><span class="status ${device.status === "bình thường" ? "approved" : "denied"}">${device.status}</span></td>
+                            <td><button class="btn btn-primary subButton">Đặt ngay</button></td>
+                        </tr>`;
+            tableBody.innerHTML += row;
+        });
+
+        // Reattach event listeners to the "Đặt ngay" buttons
+        attachSubButtonListeners();
+    }
+
+    // Function to reattach event listeners to "Đặt ngay" buttons
+    function attachSubButtonListeners() {
+        const subButtons = document.querySelectorAll(".subButton");
+        subButtons.forEach((button) => {
+            button.addEventListener("click", function () {
+                changeOptions(button);
+            });
+        });
+    }
+});
 
 
+    // change selected option to match "Đặt ngay" button
 
-    // addReservation value except resId
+    document.addEventListener("DOMContentLoaded", function () {
+    // Use event delegation on the parent element
+    const tableBody = document.getElementById("deviceTableBody");
+
+        tableBody.addEventListener("click", function (event) {
+            // Check if the clicked element is a subButton
+            if (event.target && event.target.classList.contains("subButton")) {
+                // Call the changeOptions function and pass the clicked button
+                changeOptions(event.target);
+            }
+        });
+    });
+
+    function changeOptions(button) {
+        // Get the row containing the clicked button
+        const row = button.closest("tr");
+
+        // Extract the device name from the <td> element
+        const deviceName = row.querySelector("td[name='device_name']").textContent.trim();
+        // const deviceName = row.querySelector("td[data-name='device_name']").textContent.trim();
+
+
+        // Get the <select> element
+        const selectElement = document.getElementById("device");
+
+        // Find the option in the <select> that matches the device name
+        const options = selectElement.options;
+        for (let i = 0; i < options.length; i++) {
+            if (options[i].textContent.trim() === deviceName) {
+                // Set the matching option as selected
+                selectElement.selectedIndex = i;
+                break;
+            }
+        }
+
+        // Optionally, scroll to the booking form
+        document.querySelector(".booking-form").scrollIntoView({ behavior: "smooth" });
+
+        // Log the selected device for debugging
+        console.log(`Selected Device: ${deviceName}`);
+    }
+
+
+     // addReservation value except resId
 
     function addReservation(deviceId, resDate, resBD, resRD) {
         // Create the data object
@@ -246,11 +364,37 @@
             const selectElement = document.getElementById("device");
             const deviceId = selectElement.value; // Gets the value of the selected option (DeviceId)
 
+            // Check if a device is selected
+            if (!deviceId) {
+                alert("Vui lòng chọn một thiết bị.");
+                return; // Stop further execution
+            }
+
+            // Find the selected device in the devices array
+            const selectedDevice = devices.find(device => device.device_id === deviceId);
+
+            // Decode the HTML-encoded string
+            const parser = new DOMParser();
+            const decodedStatus = parser.parseFromString(selectedDevice.status, "text/html").body.textContent;
+
+            console.log(selectedDevice);
+            // Check if the device status is "Được đặt chỗ"
+            if (selectedDevice && decodedStatus === "Đang được mượn") {
+                alert("Thiết bị đã được đặt chỗ. Vui lòng chọn thiết bị khác.");
+                return; // Stop further execution
+            }
+
             // Get other form values
             const now = new Date(); // Current date and time
             const reservationDate = formatDateToDatetimeLocal(now); // Format the current date
             const borrowedDate = document.getElementById("borrowedDate").value;
             const returnedDate = document.getElementById("returnedDate").value;
+
+			// check if returned day is greater than borrowed day
+            if (new Date(returnedDate) <= new Date(borrowedDate)) {
+                alert("Thời gian kết thúc phải sau thời gian bắt đầu. Vui lòng nhập lại.");
+                return; // Stop further execution
+            }
 
             // Call the addReservation function
             addReservation(deviceId, reservationDate, borrowedDate, returnedDate);
@@ -271,3 +415,4 @@
 
 
     </script>
+

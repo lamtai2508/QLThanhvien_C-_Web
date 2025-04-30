@@ -84,6 +84,38 @@ namespace QLThanhvien_Web.Controllers
             return devices;
         }
 
+        public List<Device> GetDevicesByInput(string input)
+        {
+
+            // If input is null or empty, return all devices
+            if (string.IsNullOrEmpty(input))
+            {
+                return GetAllDevice();
+            }
+            var devices = new List<Device>();
+            using var conn = _db.GetConnection();
+            conn.Open();
+            string query = @"SELECT * FROM devices 
+                     WHERE device_name LIKE @input 
+                     OR device_type LIKE @input";
+            using var cmd = new MySqlCommand(query, conn);
+            cmd.Parameters.AddWithValue("@input", $"%{input}%"); // Use LIKE for partial matching
+            using var reader = cmd.ExecuteReader();
+            while (reader.Read())
+            {
+                var device = new Device
+                {
+                    device_id = reader["device_id"].ToString(),
+                    device_name = reader["device_name"].ToString(),
+                    device_type = reader["device_type"].ToString(),
+                    status = reader["status"].ToString()
+                };
+                devices.Add(device);
+            }
+            return devices;
+        }
+
+
         public void UpdateDeviceStatus(string deviceId)
         {
 
@@ -180,12 +212,34 @@ namespace QLThanhvien_Web.Controllers
             cmd.ExecuteNonQuery();
         }
 
+        public string GetDeviceNameByReservation(Reservation reservation)
+        {
+            if (reservation == null || string.IsNullOrEmpty(reservation.device_id))
+            {
+                throw new ArgumentException("Invalid reservation or device_id.");
+            }
+
+            var devices = GetDeviceById(reservation.device_id);
+            if (devices != null && devices.Count > 0)
+            {
+                return devices.First().device_name; // Assuming device_id is unique
+            }
+
+            return "Device not found";
+        }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
 
         public string GetLoggedInUserId()
         {
             return Request.Cookies["account_id"];
+        }
+
+        [HttpGet]
+        public IActionResult SearchDevices(string input)
+        {
+            var devices = GetDevicesByInput(input);
+            return Json(devices); // Return the devices as JSON for testing
         }
 
 
@@ -228,6 +282,15 @@ namespace QLThanhvien_Web.Controllers
         {
             var info = GetLoggedInUserId();
             var memberList = GetReservationByMemberId(info);
+
+            // Add device names to the ViewBag
+            var deviceNames = memberList.ToDictionary(
+                reservation => reservation.reservation_id,
+                reservation => GetDeviceNameByReservation(reservation)
+            );
+
+            ViewBag.DeviceNames = deviceNames;
+
             return View(memberList);
         }
     }
