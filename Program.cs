@@ -29,7 +29,7 @@ app.MapStaticAssets();
 app.MapControllerRoute(
     name: "default",
     //pattern: "{controller=Login}/{action=Login}/{id?}")
-    pattern: "{controller=Member}/{action=Profile}/{id?}")
+    pattern: "{controller=Login}/{action=Login}/{id?}")
     .WithStaticAssets();
 
 

@@ -7,8 +7,8 @@
         public string? violation_type { get; set; }
         public string? penalty { get; set; }
         public DateTime? violation_date { get; set; }
-        public DateTime? block_date { get; set; }
-        public DateTime? unblock_date { get; set; }
+        public DateTime? block_date { get; set; } = null;
+        public DateTime? unblock_date { get; set; } = null;
         public string? status { get; set; } = "hoạt động";
 
     }

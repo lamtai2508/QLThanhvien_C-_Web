@@ -33,8 +33,8 @@ namespace QLThanhvien_Web.Controllers
                     violation_type = reader["violation_type"].ToString(),
                     penalty = reader["penalty"].ToString(),
                     violation_date = Convert.ToDateTime(reader["violation_date"]),
-                    block_date = Convert.ToDateTime(reader["block_date"]),
-                    unblock_date = Convert.ToDateTime(reader["unblock_date"]),
+                    block_date = reader["block_date"] != DBNull.Value ? Convert.ToDateTime(reader["block_date"]) : null,
+                    unblock_date = reader["unblock_date"] != DBNull.Value ? Convert.ToDateTime(reader["unblock_date"]) : null,
                     status = reader["status"].ToString()
                 };
                 violations.Add(vl);
