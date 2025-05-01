@@ -328,7 +328,7 @@
             returned_date: resRD,
         };
 
-        // Send the data to the server using fetch API
+        // Send the data to the server using fetch
         fetch('/Booking/RetrieveResData', {
             method: 'POST',
             headers: {
@@ -344,9 +344,10 @@
             }
         })
         .then(data => {
-            // Handle success (e.g., show a success message or update the UI)
-            alert('Reservation added successfully!');
-            console.log(data);
+            // Show an alert based on the server's response
+            // if (data.success) {
+            //     alert(data.message);
+            // }
         })
         .catch(error => {
             // Handle error (e.g., show an error message)
@@ -398,11 +399,55 @@
             const borrowedDate = document.getElementById("borrowedDate").value;
             const returnedDate = document.getElementById("returnedDate").value;
 
+            // Check if date values are empty
+            if (!borrowedDate || !returnedDate) {
+                alert("Không được bỏ trống thời gian đặt thiết bị");
+                return;
+            }
+
 			// check if returned day is greater than borrowed day
             if (new Date(returnedDate) <= new Date(borrowedDate)) {
                 alert("Thời gian kết thúc phải sau thời gian bắt đầu. Vui lòng nhập lại.");
                 return; // Stop further execution
             }
+
+            // prevent user have violation to reserve new device 
+
+
+            // Create the reservation data object
+            const reservationData = {
+                device_id: deviceId,
+                reservation_date: reservationDate,
+                borrowed_date: borrowedDate,
+                returned_date: returnedDate,
+            };
+            
+            fetch('/Booking/RetrieveResData', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(reservationData)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to process the reservation');
+                }
+                return response.json();
+            })
+            .then(data => {
+                // Show an alert based on the server's response
+                if (data.success) {
+                    alert(data.message); // Success message
+                } else {
+                    alert(data.message); // Error message
+                }
+            })
+            .catch(error => {
+                // Handle error (e.g., show an error message)
+                alert('Có lỗi xảy ra khi xử lý yêu cầu: ' + error.message);
+                console.error(error);
+            });
 
             // Call the addReservation function
             addReservation(deviceId, reservationDate, borrowedDate, returnedDate);

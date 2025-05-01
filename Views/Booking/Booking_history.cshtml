@@ -79,20 +79,17 @@
                         <th>Hành động</th>
                     </tr>
                 </thead>
-                @foreach (var res in Model)
-                {
                     <tbody id="deviceTableBody">
                         <tr>
-                            <td name="res_id">@res.reservation_id</td>
-                            <td>@res.device_id</td>
-                            <td>@res.reservation_date</td>
-                            <td>@res.borrowed_date</td>
-                            <td>@res.returned_date</td>
-                            <td><span class="status approved">@res.status</span></td>
+                            <td name="res_id">reservation_id</td>
+                            <td>device_id</td>
+                            <td>reservation_date</td>
+                            <td>borrowed_date</td>
+                            <td>returned_date</td>
+                            <td><span class="status approved">status</span></td>
                             <td><button class="btn btn-secondary">Chi tiết</button></td>
                         </tr>
                     </tbody>
-                }
             </table>
             <div style="margin-top:10px;">
                 <button onclick="prevPage()" id="prevBtn">Previous</button>
@@ -133,9 +130,10 @@
             </div>
         </div>
     </div>
+</div>
 
-    <script>
-        // Convert Razor model data into a JavaScript object
+<script>
+    //  create reservation data contains device name into a JavaScript object
         var reservations = [
         @foreach (var res in Model)
         {
@@ -150,11 +148,63 @@
         }
         ];
 
+         var currentPage = 1;
+         var pageSize = 5;
+
+         function renderReservations() {
+             var start = (currentPage - 1) * pageSize;
+             var end = start + pageSize;
+             var pageReservations = reservations.slice(start, end);
+
+             var tableBody = document.getElementById("deviceTableBody");
+             tableBody.innerHTML = "";
+
+             pageReservations.forEach(function(reservation) {
+                 var row = `<tr>
+                               <td name="res_id">${reservation.reservation_id}</td>
+                               <td>${reservation.device_name}</td>
+                               <td>${reservation.reservation_date}</td>
+                               <td>${reservation.borrowed_date}</td>
+                               <td>${reservation.returned_date}</td>
+                               <td><span class="status ${reservation.status == "bình thường" ? "approved" : "denied"}">${reservation.status}</span></td>
+                               <td><button class="btn btn-secondary">Chi tiết</button></td>
+                             </tr>`;
+                 tableBody.innerHTML += row;
+             });
+
+             document.getElementById("page-info").innerText = `Trang ${currentPage} / ${Math.ceil(reservations.length / pageSize)}`;
+
+             // Toggle visibility of buttons
+             document.getElementById("prevBtn").style.display = currentPage > 1 ? 'inline-block' : 'none';
+             document.getElementById("nextBtn").style.display = currentPage * pageSize < reservations.length ? 'inline-block' : 'none';
+         }
+
+         function nextPage() {
+             if (currentPage * pageSize < reservations.length) {
+                 currentPage++;
+                 renderReservations();
+             }
+         }
+
+         function prevPage() {
+             if (currentPage > 1) {
+                 currentPage--;
+                 renderReservations();
+             }
+         }
+         // render lần đầu
+         renderReservations();
+
         // Add event listeners to all "Chi tiết" buttons
-        document.querySelectorAll('.btn-secondary').forEach(button => {
-            button.addEventListener('click', function() {
+        document.addEventListener("DOMContentLoaded", function () {
+        // Use event delegation on the parent element
+        const tableBody = document.getElementById("deviceTableBody");
+
+        tableBody.addEventListener("click", function (event) {
+            // Check if the clicked element is a .btn-secondary button
+            if (event.target && event.target.classList.contains("btn-secondary")) {
                 // Get the reservation_id from the row
-                const row = this.closest('tr');
+                const row = event.target.closest("tr");
                 const reservationId = row.querySelector('[name="res_id"]').innerText.trim();
 
                 // Find the matching reservation data
@@ -170,6 +220,7 @@
                         </div>
                         <div class="user-profile">
                             <div class="profile-info">
+                            <div class="info-history">
                                 <div class="info-group">
                                     <label>ID Đặt chỗ</label>
                                     <p>${reservation.reservation_id}</p>
@@ -195,12 +246,15 @@
                                     <p><span class="status approved">${reservation.status}</span></p>
                                 </div>
                             </div>
+                            </div>
                         </div>
                     `;
                 } else {
                     alert('Không tìm thấy thông tin đặt chỗ!');
                 }
-            });
+            }
         });
-    </script>
+    });
+
+</script>
 
