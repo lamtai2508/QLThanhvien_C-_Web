@@ -228,20 +228,22 @@ namespace QLThanhvien_Web.Controllers
             return "Device not found";
         }
 
-        // check if user have violation
-        public bool HasViolations(string memberId)
+        // check if user being banned
+        public bool BeingBanned(string memberId)
         {
             using var conn = _db.GetConnection();
             conn.Open();
 
-            // Query to check if the user has any violations
-            string query = "SELECT COUNT(*) FROM violations WHERE member_id = @memberId";
+            // Query to check if the member's status is "Bị cấm"
+            string query = "SELECT status FROM members WHERE member_id = @memberId";
             using var cmd = new MySqlCommand(query, conn);
             cmd.Parameters.AddWithValue("@memberId", memberId);
 
-            // Execute the query and check if the count is greater than 0
-            var count = Convert.ToInt32(cmd.ExecuteScalar());
-            return count > 0;
+            // Execute the query and get the status
+            var status = cmd.ExecuteScalar()?.ToString();
+
+            // Return true if the status is "Bị cấm"
+            return status == "Bị cấm";
         }
 
 
@@ -279,9 +281,9 @@ namespace QLThanhvien_Web.Controllers
                 string memberId = GetLoggedInUserId();
 
                 // Check if the user has any violations
-                if (HasViolations(memberId))
+                if (BeingBanned(memberId))
                 {
-                    return Json(new { success = false, message = "You cannot make a reservation because you have violations." });
+                    return Json(new { success = false, message = "Bạn không thể đặt thiết bị vì tài khoản đang bị cấm!" });
                 }
 
                 // Add the reservation to the database
@@ -293,7 +295,7 @@ namespace QLThanhvien_Web.Controllers
                 );
                 UpdateDeviceStatus(reservation.device_id);
                 // Return a success response
-                return Json(new { success = true, message = "Reservation added successfully" });
+                return Json(new { success = true, message = "Đặt thành công!" });
             }
             catch (Exception ex)
             {
