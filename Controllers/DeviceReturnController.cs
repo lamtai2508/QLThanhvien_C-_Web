@@ -29,6 +29,7 @@ namespace QLThanhvien_Web.Controllers
                     member_id = reader["member_id"].ToString(),
                     device_id = reader["device_id"].ToString(),
                     borrow_date = Convert.ToDateTime(reader["borrow_date"]),
+                    due_date = Convert.ToDateTime(reader["due_date"]),
                     return_date = Convert.ToDateTime(reader["return_date"]),
                     status = reader["status"].ToString(),
                 };

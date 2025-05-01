@@ -87,24 +87,26 @@ namespace QLThanhvien_Web.Controllers
         }
         [HttpPost]
         public IActionResult Profile(Member mb)
-        {
+        { 
             var accountId = Request.Cookies["account_id"]; //Lấy account_id từ cookie
-            var member = GetMemberById(accountId).FirstOrDefault();
+
             if (string.IsNullOrEmpty(mb.full_name) ||
                 string.IsNullOrEmpty(mb.email) ||
                 string.IsNullOrEmpty(mb.number_phone) ||
                 string.IsNullOrEmpty(mb.gender) ||
-                mb.dob == null ) 
+                mb.dob == null)
             {
                 ViewBag.ErrorMessage = "Đổi thông tin thất bại";
-                return View(member);
+                var info = GetMemberById(accountId);
+                return View(info);
             }
             if (UpdateMember(mb))
             {
-                return View(member);
+                var info = GetMemberById(accountId);
+                return View(info);
             }
-            return View(member);
-        }
+            return View(GetMemberById(accountId));
+        } 
         [HttpGet]
         public IActionResult Profile()
         {

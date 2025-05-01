@@ -61,6 +61,7 @@
                             <th>Mã Thành viên</th>
                             <th>Mã thiết bị</th>
                             <th>Ngày mượn</th>
+                            <th>Hạn trả</th>
                             <th>Ngày trả</th>
                             <th>Trạng thái</th>
                             <th>Hành động</th>
@@ -117,6 +118,7 @@
         @: "member_id": "@dr.member_id",
         @: "device_id": "@dr.device_id",
         @: "borrow_date": "@dr.borrow_date",
+        @: "due_date": "@dr.due_date",
         @: "return_date": "@dr.return_date",
         @: "status": "@dr.status"
         @: },
@@ -172,13 +174,14 @@
                 const row = document.createElement('tr');
                 
                 // Format dates for display
-                    const borrowedDate = new Date(device.borrow_date).toLocaleString('vi-VN');
-                        const returnDate = new Date(device.return_date).toLocaleString('vi-VN');
-                
+                const borrowedDate = new Date(device.borrow_date).toLocaleString('vi-VN');
+                const returnDate = new Date(device.return_date).toLocaleString('vi-VN');
+                const dueDate = new Date(device.due_date).toLocaleString('vi-VN');
                 row.innerHTML = `
                     <td>${device.member_id}</td>
                     <td>${device.device_id}</td>
                     <td>${borrowedDate}</td>
+                    <td>${dueDate}</td>
                     <td>${returnDate}</td>
                     <td><span class="status pending">${device.status}</span></td>
                     <td><button class="btn btn-primary" onclick="selectDevice('${device.device_id}')">Trả ngay</button></td>
