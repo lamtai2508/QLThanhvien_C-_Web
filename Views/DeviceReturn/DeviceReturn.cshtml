@@ -240,7 +240,7 @@
             const deviceId = document.getElementById('device').value;
             // get time-now
             const now = new date();
-            const returnDate = formatDate(now); // Format the current date
+            const returnDate = formatDateToDatetimeLocal(now); // Format the current date
             const condition = document.getElementById('condition').value;
 
             if (!deviceId || !returnDate || !condition) {
