@@ -168,6 +168,7 @@
             const startIndex = (currentPage - 1) * itemsPerPage;
             const paginatedDevices = filteredDevices.slice(startIndex, startIndex + itemsPerPage);
 
+
             
             paginatedDevices.forEach(device => {
                 const row = document.createElement('tr');
@@ -175,17 +176,9 @@
                 // Format dates for display
                     
                     const borrowedDateObj = new Date(device.borrow_date);
-                    const borrowedDate = borrowedDateObj.toLocaleDateString('vi-VN', {
-                        day: '2-digit',
-                        month: '2-digit',
-                        year: '2-digit'
-                    });
+                    const borrowedDate = formatDate(borrowedDateObj);
                     const returnedDateObj = new Date(device.return_date);
-                    const returnedDate = returnedDateObj.toLocaleString('vi-VN' , {
-                        day: '2-digit',
-                        month: '2-digit', 
-                        year: '2-digit'
-                    });
+                    const returnedDate = formatDate(returnedDateObj);
                 
                 row.innerHTML = `
                     <td>${device.member_id}</td>
@@ -247,7 +240,7 @@
             const deviceId = document.getElementById('device').value;
             // get time-now
             const now = new date();
-            const returnDate = formatDateToDatetimeLocal(now); // Format the current date
+            const returnDate = formatDate(now); // Format the current date
             const condition = document.getElementById('condition').value;
 
             if (!deviceId || !returnDate || !condition) {
@@ -280,19 +273,26 @@
             document.getElementById('condition').value = '';
 
             const now = new Date();
-            const formattedDate = now.toISOString().slice(0, 16);
+            const formattedDate = formatDateToDatetimeLocal(now);
             document.getElementById('returnDate').value = formattedDate;
         }
 
-        function formatDateToDatetimeLocal(date) {
-        const year = date.getFullYear();
-        const month = String(date.getMonth() + 1).padStart(2, '0');
-        const day = String(date.getDate()).padStart(2, '0');
-        const hours = String(date.getHours()).padStart(2, '0');
-        const minutes = String(date.getMinutes()).padStart(2, '0');
+        function formatDate(date) {
+            const day = String(date.getDate()).padStart(2, '0');
+            const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are zero-based
+            const year = date.getFullYear();
+            return `${day}-${month}-${year}`;
+        }
 
-        return `${year}-${month}-${day}T${hours}:${minutes}`;
-    }
+        function formatDateToDatetimeLocal(date) {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            const hours = String(date.getHours()).padStart(2, '0');
+            const minutes = String(date.getMinutes()).padStart(2, '0');
+
+            return `${year}-${month}-${day}T${hours}:${minutes}`;
+        }
 
     </script>
     
