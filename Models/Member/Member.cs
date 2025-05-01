@@ -8,7 +8,7 @@
         public string? number_phone { get; set; } 
         public DateTime? dob { get; set; }
         public string? email { get; set; } 
-        public string status { get; set; } = "hoạt động";
+        public string? status { get; set; } = "Đang hoạt động"; 
         
     }
 }

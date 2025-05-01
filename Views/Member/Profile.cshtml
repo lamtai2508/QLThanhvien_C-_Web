@@ -95,7 +95,10 @@
                         </div>
                         <div class="info-group">
                             <label>Trạng thái</label>
-                            <p>@mb.status</p>
+                            <p style="color:@(
+                                mb.status == "Bị cấm" ? "red" :
+                                mb.status == "Đang hoạt động" ? "green" :
+                                mb.status == "Cánh cáo" ? "orange" : "black")">@mb.status</p>
                         </div>
                     </div>
             </div>
