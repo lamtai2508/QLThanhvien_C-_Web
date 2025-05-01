@@ -228,6 +228,23 @@ namespace QLThanhvien_Web.Controllers
             return "Device not found";
         }
 
+        // check if user have violation
+        public bool HasViolations(string memberId)
+        {
+            using var conn = _db.GetConnection();
+            conn.Open();
+
+            // Query to check if the user has any violations
+            string query = "SELECT COUNT(*) FROM violations WHERE member_id = @memberId";
+            using var cmd = new MySqlCommand(query, conn);
+            cmd.Parameters.AddWithValue("@memberId", memberId);
+
+            // Execute the query and check if the count is greater than 0
+            var count = Convert.ToInt32(cmd.ExecuteScalar());
+            return count > 0;
+        }
+
+
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
 
         public string GetLoggedInUserId()
@@ -258,6 +275,15 @@ namespace QLThanhvien_Web.Controllers
         {
             try
             {
+                // Get the logged-in user's ID
+                string memberId = GetLoggedInUserId();
+
+                // Check if the user has any violations
+                if (HasViolations(memberId))
+                {
+                    return Json(new { success = false, message = "You cannot make a reservation because you have violations." });
+                }
+
                 // Add the reservation to the database
                 AddReservation(
                     reservation.device_id,
@@ -271,8 +297,8 @@ namespace QLThanhvien_Web.Controllers
             }
             catch (Exception ex)
             {
-                // Return an error response
-                return Json(new { success = false, message = ex.Message});
+                // Return an error
+                return Json(new { success = false });
             }
         }
 
