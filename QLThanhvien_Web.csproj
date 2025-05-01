@@ -20,6 +20,7 @@
   <ItemGroup>
     <Folder Include="Models\Booking_history\" />
     <Folder Include="Models\Violation_history\" />
+    <Folder Include="Services\DatabaseMysql\" />
   </ItemGroup>
 
 </Project>
