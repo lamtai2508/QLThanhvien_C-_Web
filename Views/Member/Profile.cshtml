@@ -1,5 +1,5 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Profile member";
 }
 @model List<QLThanhvien_Web.Models.Member>
 
@@ -25,6 +25,9 @@
             </div>
             <div class="menu-item" onclick="window.location.href='/Booking/Booking_history'">
                 <i>📚</i> Lịch sử đặt chỗ
+            </div>
+            <div class="menu-item" onclick="window.location.href='/DeviceReturn/DeviceReturn'">
+                <i>🔄</i> Trả thiết bị
             </div>
             <div class="menu-item" onclick="window.location.href='/Violation/Violations_history'">
                 <i>⚠️</i> Lịch sử vi phạm
@@ -53,6 +56,10 @@
                 <h2>Thông tin cá nhân</h2>
                     <button class="btn btn-secondary">Chỉnh sửa</button>
             </div>
+            @if (ViewBag.BanMessage != null)
+            {
+                    <div style="color: red; margin-top: 10px;">@ViewBag.BanMessage</div>
+            }
             @if (ViewBag.ErrorMessage != null)
             {
                 <div style="color: red; margin-top: 10px;">@ViewBag.ErrorMessage</div>

@@ -27,6 +27,9 @@
             <div class="menu-item" onclick="window.location.href='/Booking/Booking_history'">
                 <i>📚</i> Lịch sử đặt chỗ
             </div>
+            <div class="menu-item" onclick="window.location.href='/DeviceReturn/DeviceReturn'">
+                <i>🔄</i> Trả thiết bị
+            </div>
             <div class="menu-item" onclick="window.location.href='/Violation/Violations_history'">
                 <i>⚠️</i> Lịch sử vi phạm
             </div>
@@ -72,7 +75,7 @@
                                 <td name="device_id" id="device_id">@d.device_id</td>
                                 <td name="device_name" id="device_name">@d.device_name</td>
                                 <td name="device_type" id="device_type">@d.device_type</td>
-                                <td name="status" id="device_status"><span class="status approved" @(d.status =="bình thường" ? "approved" : "denied" )>@d.status</span></td>
+                                <td name="status" id="device_status"><span class="status @(d.status =="Có sẵn" ? "approved" : "denied" )">@d.status</span></td>
                                 <td><button class="btn btn-primary subButton" id="subButton" >Đặt ngay</button></td>
                             </tr>
                         }
@@ -378,8 +381,13 @@
             const decodedStatus = parser.parseFromString(selectedDevice.status, "text/html").body.textContent;
 
             console.log(selectedDevice);
-            // Check if the device status is "Được đặt chỗ"
+            // Check if the device status is "Được được mượn"
             if (selectedDevice && decodedStatus === "Đang được mượn") {
+                alert("Thiết bị đang được mượn. Vui lòng chọn thiết bị khác.");
+                return; // Stop further execution
+            }
+            // Check if the device status is "Được đặt chỗ"
+            if (selectedDevice && decodedStatus === "Được đặt chỗ") {
                 alert("Thiết bị đã được đặt chỗ. Vui lòng chọn thiết bị khác.");
                 return; // Stop further execution
             }

@@ -4,6 +4,7 @@ using QLThanhvien_Web.Models;
 using QLThanhvien_Web.Services;
 
 using Microsoft.AspNetCore.Mvc;
+using Mysqlx;
 
 namespace QLThanhvien_Web.Controllers
 {
@@ -96,7 +97,8 @@ namespace QLThanhvien_Web.Controllers
             using var conn = _db.GetConnection();
             conn.Open();
             string query = @"SELECT * FROM devices 
-                     WHERE device_name LIKE @input 
+                     WHERE device_id LIKE @input 
+                     OR device_name LIKE @input 
                      OR device_type LIKE @input";
             using var cmd = new MySqlCommand(query, conn);
             cmd.Parameters.AddWithValue("@input", $"%{input}%"); // Use LIKE for partial matching
@@ -114,7 +116,6 @@ namespace QLThanhvien_Web.Controllers
             }
             return devices;
         }
-
 
         public void UpdateDeviceStatus(string deviceId)
         {
@@ -282,7 +283,6 @@ namespace QLThanhvien_Web.Controllers
         {
             var info = GetLoggedInUserId();
             var memberList = GetReservationByMemberId(info);
-
             // Add device names to the ViewBag
             var deviceNames = memberList.ToDictionary(
                 reservation => reservation.reservation_id,

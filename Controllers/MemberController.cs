@@ -43,6 +43,21 @@ namespace QLThanhvien_Web.Controllers
             }
             return members;
         }
+        // Lấy status của member = id
+        public string? GetStatusMemberById(string memberId)
+        {
+            using var conn = _db.GetConnection();
+            conn.Open();
+            string query = "select status from members where member_id = @memberId";
+            using var cmd = new MySqlCommand(query, conn);
+            cmd.Parameters.AddWithValue("@memberId", memberId);
+            using var reader = cmd.ExecuteReader();
+            if (reader.Read())
+            {
+                return reader["status"].ToString();
+            }
+            return null;
+        }
         // Chính sửa thông tin
         public bool UpdateMember(Member mb)
         {
@@ -74,6 +89,7 @@ namespace QLThanhvien_Web.Controllers
         public IActionResult Profile(Member mb)
         {
             var accountId = Request.Cookies["account_id"]; //Lấy account_id từ cookie
+            var member = GetMemberById(accountId).FirstOrDefault();
             if (string.IsNullOrEmpty(mb.full_name) ||
                 string.IsNullOrEmpty(mb.email) ||
                 string.IsNullOrEmpty(mb.number_phone) ||
@@ -81,20 +97,24 @@ namespace QLThanhvien_Web.Controllers
                 mb.dob == null ) 
             {
                 ViewBag.ErrorMessage = "Đổi thông tin thất bại";
-                var info = GetMemberById(accountId);
-                return View(info);
+                return View(member);
             }
             if (UpdateMember(mb))
             {
-                var info = GetMemberById(accountId);
-                return View(info);
+                return View(member);
             }
-            return View(GetMemberById(accountId));
+            return View(member);
         }
         [HttpGet]
         public IActionResult Profile()
         {
             var accountId = Request.Cookies["account_id"]; //Lấy account_id từ cookie
+            var member = GetMemberById(accountId).FirstOrDefault();
+            ViewBag.Status = member.status;
+            if (member.status == "Bị cấm")
+            {
+                ViewBag.BanMessage = "Thành viên đang bị cấm không thể đặt chỗ thiết bị!";
+            }
             if (string.IsNullOrEmpty(accountId))
             {
                 return RedirectToAction("Login", "Login"); // nếu cookie null, trả về trang đăng nhập
