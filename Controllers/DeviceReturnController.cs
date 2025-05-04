@@ -30,13 +30,78 @@ namespace QLThanhvien_Web.Controllers
                     device_id = reader["device_id"].ToString(),
                     borrow_date = Convert.ToDateTime(reader["borrow_date"]),
                     due_date = Convert.ToDateTime(reader["due_date"]),
-                    return_date = Convert.ToDateTime(reader["return_date"]),
+                    return_date = reader["return_date"] == DBNull.Value
+                      ? (DateTime?) null
+                      : Convert.ToDateTime(reader["return_date"]),
                     status = reader["status"].ToString(),
                 };
                 DR.Add(deviceReturn);
             }
             return DR;
         }
+        public bool updateDeviceReturn(string deviceId, DateTime returnDate, string status)
+        {
+            using var conn = _db.GetConnection();
+            conn.Open();
+
+            string checkQuery = "SELECT return_date FROM borroweddevices WHERE device_id = @deviceId";
+            var checkCmd = new MySqlCommand(checkQuery, conn);
+            checkCmd.Parameters.AddWithValue("@deviceId", deviceId);
+
+            var result = checkCmd.ExecuteScalar();
+
+            // Nếu đã có return_date (khác NULL), thiết bị đã được trả
+            if (result != null && result != DBNull.Value)
+            {
+                return false; // Thiết bị đã trả rồi, không cho trả lại lần nữa
+            }
+
+            string query = "UPDATE borroweddevices SET return_date = @return_date, status = @status WHERE device_id = @deviceId";
+            var cmd = new MySqlCommand(query, conn);
+            cmd.Parameters.AddWithValue("@deviceId", deviceId);
+            cmd.Parameters.AddWithValue("@return_date", returnDate);
+            cmd.Parameters.AddWithValue("@status", @status);
+            int rowsEffect = cmd.ExecuteNonQuery();
+            return rowsEffect > 0;
+        }
+        public bool updateDeviceStatus(string deviceId, string status)
+        {
+            using var conn = _db.GetConnection();
+            conn.Open();
+            string query = "UPDATE devices SET status = @status WHERE device_id = @deviceId";
+            var cmd = new MySqlCommand(query, conn);
+            cmd.Parameters.AddWithValue("@deviceId", deviceId);
+            cmd.Parameters.AddWithValue("@status", @status);
+            int rowsEffect = cmd.ExecuteNonQuery();
+            return rowsEffect > 0;
+        }
+        [HttpPost]
+        public IActionResult DeviceReturn(string device_id, DateTime return_date)
+        {
+            var accountid = Request.Cookies["account_id"];
+            Response.Cookies.Append("device_id", device_id, new CookieOptions
+            {
+                Expires = DateTimeOffset.Now.AddHours(1)
+            });
+
+            var deviceId = Request.Cookies["device_id"];
+            if (string.IsNullOrEmpty(deviceId))
+            {
+                return Json(new { success = false, message = "Không có thông tin thiết bị trong cookie." });
+            }
+
+            // Cập nhật thiết bị trả về
+            if (!updateDeviceReturn(deviceId, return_date, "Đã trả lại"))
+            {
+                return Json(new { success = false, message = "Thiết bị đã được trả lại rồi." });
+            }
+            else
+            {
+                updateDeviceStatus(deviceId, "Có sẵn");
+                return Json(new { success = true, message = "Thiết bị đã được trả lại thành công!" });
+            }
+        }
+        [HttpGet]
         public IActionResult DeviceReturn()
         {
             var accountId = Request.Cookies["account_id"];

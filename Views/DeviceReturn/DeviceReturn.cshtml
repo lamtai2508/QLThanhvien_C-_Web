@@ -83,17 +83,17 @@
                 <div class="section-header">
                     <h2>Trả thiết bị</h2>
                 </div>
-                <form class="booking-form" id="returnForm">
+            <form class="booking-form" id="returnForm" action="/DeviceReturn/DeviceReturn" method="post">
                     <div class="form-group">
                         <label for="device">Thiết bị</label>
-                        <select id="device" required>
+                        <select id="device" name="device_id" required>
                             <option value="">Chọn thiết bị</option>
                             <!-- Options will be populated by JavaScript -->
                         </select>
                     </div>
                     <div class="form-group">
                         <label for="returnDate">Ngày trả</label>
-                        <input type="datetime-local" id="returnDate" required>
+                        <input type="datetime-local" id="returnDate" name="return_date" required>
                     </div>
                     <div class="form-group">
                         <label for="condition">Tình trạng thiết bị</label>
@@ -152,7 +152,7 @@
         function populateDeviceDropdown() {
             const deviceSelect = document.getElementById('device');
             deviceSelect.innerHTML = '<option value="">Chọn thiết bị</option>';
-            
+
             borrowedDevices.forEach(device => {
                 const option = document.createElement('option');
                 option.value = device.device_id;
@@ -160,6 +160,23 @@
                 deviceSelect.appendChild(option);
             });
         }
+
+            // Hàm lưu giá trị vào cookie khi bấm nút "Commit"
+        function saveDeviceToCookie() {
+            const deviceSelect = document.getElementById('device');
+            const selectedDeviceId = deviceSelect.value;
+
+            if (selectedDeviceId) {
+                // Lưu vào cookie, thời gian hết hạn là 30 phút
+                document.cookie = `device_id=${selectedDeviceId}; path=/; max-age=${30 * 60}`;
+
+                alert(`Đã lưu device_id ${selectedDeviceId} vào cookie!`);
+            } else {
+                alert('@ViewBag.ErrorMessage');
+            }
+        }
+
+        
 
         // Function to display devices with pagination
         function displayDevices() {
@@ -176,28 +193,20 @@
                 const row = document.createElement('tr');
                 
                 // Format dates for display
-<<<<<<< HEAD
-                const borrowedDate = new Date(device.borrow_date).toLocaleString('vi-VN');
-                const returnDate = new Date(device.return_date).toLocaleString('vi-VN');
-                const dueDate = new Date(device.due_date).toLocaleString('vi-VN');
-=======
                     
                     const borrowedDateObj = new Date(device.borrow_date);
                     const borrowedDate = formatDate(borrowedDateObj);
+                    const dueDateObj = new Date(device.borrow_date);
+                    const dueDate = formatDate(borrowedDateObj);
                     const returnedDateObj = new Date(device.return_date);
                     const returnedDate = formatDate(returnedDateObj);
                 
->>>>>>> tien
                 row.innerHTML = `
                     <td>${device.member_id}</td>
                     <td>${device.device_id}</td>
                     <td>${borrowedDate}</td>
-<<<<<<< HEAD
                     <td>${dueDate}</td>
-                    <td>${returnDate}</td>
-=======
                     <td>${returnedDate}</td>
->>>>>>> tien
                     <td><span class="status pending">${device.status}</span></td>
                     <td><button class="btn btn-primary" onclick="selectDevice('${device.device_id}')">Trả ngay</button></td>
                 `;
@@ -241,32 +250,46 @@
         }
 
         // Function to select a device for return
-        function selectDevice(deviceId) {
-            document.getElementById('device').value = deviceId;
-            // Scroll to the form
-            document.querySelector('.booking-form').scrollIntoView({ behavior: 'smooth' });
-        }
+                function selectDevice(deviceId) {
+                    document.getElementById('device').value = deviceId;
+                    // Scroll to the form
+                    document.querySelector('.booking-form').scrollIntoView({ behavior: 'smooth' });
+                }
 
-        // Function to handle form submission
-        function handleReturnSubmit() {
+                // Function to handle form submission
+                function handleReturnSubmit() {
+                const deviceId = document.getElementById('device').value;
+                const returnDate = document.getElementById('returnDate').value;  // Nếu là input datetime-local
+                const condition = document.getElementById('condition').value;
 
-            const deviceId = document.getElementById('device').value;
-            // get time-now
-            const now = new date();
-            const returnDate = formatDateToDatetimeLocal(now); // Format the current date
-            const condition = document.getElementById('condition').value;
+                if (!deviceId || !returnDate || !condition) {
+                    alert('Vui lòng điền đầy đủ thông tin!');
+                    return;
+                }
 
-            if (!deviceId || !returnDate || !condition) {
-                alert('Vui lòng điền đầy đủ thông tin!');
-                return;
-            }
-
-            // Find the device for the alert
-            const device = borrowedDevices.find(d => d.device_id === deviceId);
-            const deviceLabel = device ? `${device.device_id} - ${device.member_id}` : deviceId;
-
-            alert(`Đã trả thiết bị ${deviceLabel} thành công!`);
-
+                // Gửi yêu cầu AJAX đến server
+                fetch('/DeviceReturn/DeviceReturn', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    body: new URLSearchParams({
+                        'device_id': deviceId,
+                        'return_date': returnDate // Chắc chắn rằng returnDate có giá trị hợp lệ
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert(data.message);
+                    } else {
+                        alert(data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Có lỗi xảy ra:', error);
+                });
+            
             // Reset the form
             resetForm();
 
