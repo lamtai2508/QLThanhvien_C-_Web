@@ -3,6 +3,8 @@
 *@
 @{
 }
+@using System.Web
+
 <div class="body">
     <div class="login-container">
         <div class="tabs">
@@ -23,7 +25,9 @@
                     </div>
                     @if (ViewBag.ErrorMessage != null)
                     {
-                        <div style="color: red; margin-top: 10px;">@ViewBag.ErrorMessage</div>
+                        <script>
+                            alert("@Html.Raw(HttpUtility.JavaScriptStringEncode(ViewBag.ErrorMessage))");
+                        </script>
                     }
                     <button type="submit">Đăng nhập</button>
                 </form>
