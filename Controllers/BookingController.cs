@@ -244,7 +244,7 @@ namespace QLThanhvien_Web.Controllers
             var status = cmd.ExecuteScalar()?.ToString();
 
             // Return true if the status is "Bị cấm"
-            return status == "Bị cấm";
+            return status == "Đang bị tạm khóa";
         }
 
 
