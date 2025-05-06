@@ -41,10 +41,28 @@ namespace QLThanhvien_Web.Controllers
             using var reader = cmd.ExecuteReader();
             return reader.Read(); // trả về true
         }
+
+        // Lấy status member bằng account_id
+        public string? GetStatusMember(string memberId)
+        {
+            using var conn = _db.GetConnection();
+            conn.Open();
+            string query = "select status from members where member_id = @memberId";
+            using var cmd = new MySqlCommand(query, conn);
+            cmd.Parameters.AddWithValue("@memberId", memberId);
+            using var reader = cmd.ExecuteReader();
+            if (reader.Read())
+            {
+                return reader["status"].ToString();
+            }
+            return null;
+        }
+
         [HttpPost]
         public IActionResult Login(string account_id, string password)
         {
             var account = GetAccountId(account_id);
+
             // Báo lỗi khi để trống
             if (account_id == null || password == null)
             {
@@ -60,12 +78,20 @@ namespace QLThanhvien_Web.Controllers
             //đăng nhập thành công và lưu thông tin vào cookie
             if (CheckPassword(account_id, password))
             {
-                Response.Cookies.Append("account_id", account_id, new CookieOptions
+                if (GetStatusMember(account_id)?.ToLower() == "khóa vĩnh viễn")
                 {
-                    Expires = DateTimeOffset.Now.AddHours(1)
-                });
-                return RedirectToAction("Profile", "Member"); // chuyển hướng tới Profile
+                    ViewBag.ErrorMessage = "Tài khoản thành viên đã bị khóa, không thể đăng nhập";
+                    return View();
+                }
+                else { 
+                    Response.Cookies.Append("account_id", account_id, new CookieOptions
+                    {
+                        Expires = DateTimeOffset.Now.AddHours(1)
+                    });
+                    return RedirectToAction("Profile", "Member"); // chuyển hướng tới Profile
+                }
             }
+
             //báo lỗi sai mật khẩu
             else
             {
