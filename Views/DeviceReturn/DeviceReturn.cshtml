@@ -93,7 +93,7 @@
                     </div>
                     <div class="form-group">
                         <label for="returnDate">Ngày trả</label>
-                        <input type="datetime-local" id="returnDate" name="return_date" readonly>
+                    <input type="datetime-local" id="returnDate" name="return_date" required>
                     </div>
                     <div class="form-actions">
                         <button type="button" class="btn btn-secondary" onclick="resetForm()">Hủy</button>
@@ -192,8 +192,8 @@
                     
                     const borrowedDateObj = new Date(device.borrow_date);
                     const borrowedDate = formatDate(borrowedDateObj);
-                    const dueDateObj = new Date(device.borrow_date);
-                    const dueDate = formatDate(borrowedDateObj);
+                    const dueDateObj = new Date(device.due_date);
+                    const dueDate = formatDate(dueDateObj);
                     const returnedDateObj = new Date(device.return_date);
                     const returnedDate = formatDate(returnedDateObj);
                 

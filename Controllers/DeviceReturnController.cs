@@ -73,7 +73,29 @@ namespace QLThanhvien_Web.Controllers
             int rowsAffected = updateCmd.ExecuteNonQuery();
             return rowsAffected > 0;
         }
+        public DateTime GetBorrowDateByDeviceId(string deviceId)
+        {
+            using var conn = _db.GetConnection();
+            conn.Open();
 
+            string query = @"
+            SELECT borrow_date 
+            FROM borroweddevices 
+            WHERE device_id = @deviceId AND return_date IS NULL 
+            ORDER BY borrow_date DESC 
+            LIMIT 1";
+
+            using var cmd = new MySqlCommand(query, conn);
+            cmd.Parameters.AddWithValue("@deviceId", deviceId);
+
+            var result = cmd.ExecuteScalar();
+
+            if (result != null && DateTime.TryParse(result.ToString(), out DateTime borrowDate))
+            {
+                return borrowDate;
+            }
+            throw new Exception("Không tìm thấy ngày mượn của thiết bị hoặc thiết bị đã được trả.");
+        }
         public bool updateDeviceStatus(string deviceId, string status)
         {
             using var conn = _db.GetConnection();
@@ -99,6 +121,12 @@ namespace QLThanhvien_Web.Controllers
             if (string.IsNullOrEmpty(deviceId))
             {
                 return Json(new { success = false, message = "Không có thông tin thiết bị trong cookie." });
+            }
+            DateTime borrowDate = GetBorrowDateByDeviceId(deviceId); // Giả định bạn có hàm này
+
+            if (return_date < borrowDate)
+            {
+                return Json(new { success = false, message = "Ngày trả không thể nhỏ hơn ngày mượn." });
             }
 
             // Cập nhật thiết bị trả về
