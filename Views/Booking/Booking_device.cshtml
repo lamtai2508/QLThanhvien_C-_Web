@@ -105,7 +105,7 @@
                         <option value="@dv.device_id" id="device-name">@dv.device_name</option>
                     }
 
-                        </select>
+                </select>
                     </div>
                     <div class="form-group">
                         <label for="start-time">Thời gian bắt đầu</label>
@@ -117,19 +117,17 @@
                     </div>
                     <div class="form-group">
                         <label for="purpose">Mục đích sử dụng</label>
-                        <textarea id="purpose" placeholder="Nhập mục đích sử dụng thiết bị..." required></textarea>
+                        <textarea id="purpose" placeholder="Nhập mục đích sử dụng thiết bị..."></textarea>
                     </div>
                     <div class="form-group">
                         <label for="location">Địa điểm sử dụng</label>
-                        <input type="text" id="location" placeholder="Nhập địa điểm sử dụng" required>
+                        <input type="text" id="location" placeholder="Nhập địa điểm sử dụng">
                     </div>
                     <div class="form-actions">
                         <button type="button" class="btn btn-secondary">Hủy</button>
                         <button type="submit" class="btn btn-primary">Đặt chỗ</button>
                     </div>
-                </form>
-            </div>
-        </div>
+        </form>
     </div>
 
     <script>
@@ -411,6 +409,12 @@
                 return; // Stop further execution
             }
 
+			// check if borrowed date is greater than current date
+			if (new Date(borrowedDate) < now) {
+				alert("Thời gian bắt đầu không được nhỏ hơn thời gian hiện tại. Vui lòng nhập lại.");
+				return; // Stop further execution
+			}
+
             // prevent user have violation to reserve new device 
 
 
@@ -450,7 +454,7 @@
             });
 
             // Call the addReservation function
-            addReservation(deviceId, reservationDate, borrowedDate, returnedDate);
+            // addReservation(deviceId, reservationDate, borrowedDate, returnedDate);
             console.log(deviceId, reservationDate, borrowedDate, returnedDate);
         });
     });

@@ -94,7 +94,8 @@ namespace QLThanhvien_Web.Controllers
                 Expires = DateTimeOffset.Now.AddHours(1)
             });
 
-            var deviceId = Request.Cookies["device_id"];
+            //var deviceId = Request.Cookies["device_id"];
+            var deviceId = device_id;
             if (string.IsNullOrEmpty(deviceId))
             {
                 return Json(new { success = false, message = "Không có thông tin thiết bị trong cookie." });
