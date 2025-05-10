@@ -44,26 +44,36 @@ namespace QLThanhvien_Web.Controllers
             using var conn = _db.GetConnection();
             conn.Open();
 
-            string checkQuery = "SELECT return_date FROM borroweddevices WHERE device_id = @deviceId";
+            // Kiểm tra bản ghi mượn gần nhất chưa trả
+            string checkQuery = @"
+            SELECT COUNT(*) 
+            FROM borroweddevices 
+            WHERE device_id = @deviceId AND return_date IS NULL";
             var checkCmd = new MySqlCommand(checkQuery, conn);
             checkCmd.Parameters.AddWithValue("@deviceId", deviceId);
 
-            var result = checkCmd.ExecuteScalar();
+            var result = Convert.ToInt32(checkCmd.ExecuteScalar());
 
-            // Nếu đã có return_date (khác NULL), thiết bị đã được trả
-            if (result != null && result != DBNull.Value)
+            // Nếu không có bản ghi chưa trả, nghĩa là thiết bị đã được trả rồi
+            if (result == 0)
             {
-                return false; // Thiết bị đã trả rồi, không cho trả lại lần nữa
+                return false;
             }
 
-            string query = "UPDATE borroweddevices SET return_date = @return_date, status = @status WHERE device_id = @deviceId";
-            var cmd = new MySqlCommand(query, conn);
-            cmd.Parameters.AddWithValue("@deviceId", deviceId);
-            cmd.Parameters.AddWithValue("@return_date", returnDate);
-            cmd.Parameters.AddWithValue("@status", @status);
-            int rowsEffect = cmd.ExecuteNonQuery();
-            return rowsEffect > 0;
+            // Cập nhật bản ghi mượn chưa được trả
+            string updateQuery = @"
+            UPDATE borroweddevices 
+            SET return_date = @return_date, status = @status 
+            WHERE device_id = @deviceId AND return_date IS NULL";
+            var updateCmd = new MySqlCommand(updateQuery, conn);
+            updateCmd.Parameters.AddWithValue("@deviceId", deviceId);
+            updateCmd.Parameters.AddWithValue("@return_date", returnDate);
+            updateCmd.Parameters.AddWithValue("@status", status);
+
+            int rowsAffected = updateCmd.ExecuteNonQuery();
+            return rowsAffected > 0;
         }
+
         public bool updateDeviceStatus(string deviceId, string status)
         {
             using var conn = _db.GetConnection();
